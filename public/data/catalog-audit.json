@@ -1,0 +1,127 @@
+{
+  "9678267": {
+    "originalSegments": 1,
+    "points": 1960,
+    "gaps": [],
+    "version": 16,
+    "osmTimestamp": "2025-09-13T11:39:42Z",
+    "difficultyCoverage": 0.5454545454545454,
+    "anchors": [
+      {
+        "index": 655,
+        "distance": 0
+      },
+      {
+        "index": 1748,
+        "distance": 11.698812040453154
+      }
+    ],
+    "reversed": false,
+    "connectors": [
+      {
+        "points": 2,
+        "distance": 11.698812040453154,
+        "source": "Liaison pédestre · Col de Tricot · OpenRouteService"
+      }
+    ]
+  },
+  "9678296": {
+    "originalSegments": 1,
+    "points": 496,
+    "gaps": [],
+    "version": 2,
+    "osmTimestamp": "2019-06-11T11:55:16Z",
+    "difficultyCoverage": 1,
+    "anchors": [
+      {
+        "index": 3053,
+        "distance": 0
+      },
+      {
+        "index": 4538,
+        "distance": 0
+      }
+    ],
+    "reversed": false,
+    "connectors": []
+  },
+  "9678362": {
+    "originalSegments": 3,
+    "points": 17002,
+    "gaps": [],
+    "version": 156,
+    "osmTimestamp": "2026-09-06T10:18:48Z",
+    "difficultyCoverage": 0.4418918918918919
+  },
+  "9678375": {
+    "originalSegments": 1,
+    "points": 453,
+    "gaps": [],
+    "version": 8,
+    "osmTimestamp": "2026-05-25T21:50:34Z",
+    "difficultyCoverage": 1,
+    "anchors": [
+      {
+        "index": 7821,
+        "distance": 0
+      },
+      {
+        "index": 8242,
+        "distance": 0
+      }
+    ],
+    "reversed": false,
+    "connectors": []
+  },
+  "9678380": {
+    "originalSegments": 1,
+    "points": 1258,
+    "gaps": [],
+    "version": 9,
+    "osmTimestamp": "2026-07-07T20:56:02Z",
+    "difficultyCoverage": 0.65625,
+    "anchors": [
+      {
+        "index": 11045,
+        "distance": 0
+      },
+      {
+        "index": 12296,
+        "distance": 0
+      }
+    ],
+    "reversed": true,
+    "connectors": [
+      {
+        "points": 132,
+        "distance": 2666.8962701893306,
+        "source": "Liaison pédestre · Fenêtre d’Arpette · OpenRouteService"
+      }
+    ]
+  },
+  "9678437": {
+    "originalSegments": 1,
+    "points": 1226,
+    "gaps": [],
+    "version": 12,
+    "osmTimestamp": "2026-07-22T10:09:14Z",
+    "difficultyCoverage": 1,
+    "anchors": [
+      {
+        "index": 12296,
+        "distance": 0
+      },
+      {
+        "index": 12939,
+        "distance": 0
+      }
+    ],
+    "reversed": false,
+    "connectors": []
+  },
+  "start": {
+    "name": "Les Houches",
+    "distanceToCentre": 47.58491302277139,
+    "orientation": "counterclockwise"
+  }
+}
