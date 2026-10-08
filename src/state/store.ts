@@ -15,6 +15,7 @@ import type { Catalog, LatLon, Route, RouteSegment, RouteStatistics, Track, Trac
 import { fillMissingElevations } from '../services/elevation/elevation';
 import { DEFAULT_BASEMAP } from '../services/map/basemaps';
 import { DEFAULT_ROUTING_SETTINGS, type RoutingSettings } from '../services/routing/types';
+import { nearestPoi } from '../services/pois/pois';
 import { makeProject, projectStore, readPref, writePref, type StoredProject } from '../services/storage/projectStore';
 
 export type Mode = 'view' | 'edit';
@@ -347,7 +348,14 @@ export const useApp = create<AppState>()((set, get) => {
       get().edit((r) => ops.reorderWaypoint(r, from, to));
     },
     toggleStageEnd(index) {
-      get().edit((r) => ops.updateWaypoint(r, index, { stageEnd: !r.waypoints[index]?.stageEnd }));
+      get().edit((r) => {
+        const w = r.waypoints[index];
+        if (!w) return r;
+        const stageEnd = !w.stageEnd;
+        // Nom proposé : refuge, village ou col le plus proche (si les POI sont chargés).
+        const name = stageEnd && !w.name ? nearestPoi(w)?.name : undefined;
+        return ops.updateWaypoint(r, index, name ? { stageEnd, name } : { stageEnd });
+      });
     },
     renamePoint(index, name) {
       get().edit((r) => ops.updateWaypoint(r, index, { name: name.trim() || undefined }));

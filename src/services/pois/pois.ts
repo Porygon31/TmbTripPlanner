@@ -21,6 +21,26 @@ export interface PoiProvider {
 export const MASSIF_BBOX: [number, number, number, number] = [45.66, 6.6, 46.12, 7.2];
 
 const CACHE_KEY = 'pois:v1';
+let lastLoaded: Poi[] = [];
+
+/**
+ * Point d'intérêt nommé le plus proche (parmi ceux déjà chargés), pour proposer
+ * un nom aux fins d'étape. Renvoie `null` si aucun n'est à moins de `maxDistance` mètres.
+ */
+export function nearestPoi(p: { lat: number; lon: number }, maxDistance = 500, kinds: PoiKind[] = ['hut', 'village', 'hamlet', 'pass']): Poi | null {
+  const k = Math.cos((p.lat * Math.PI) / 180) * 111_320;
+  let best: Poi | null = null;
+  let bestD = maxDistance;
+  for (const poi of lastLoaded) {
+    if (!kinds.includes(poi.kind)) continue;
+    const d = Math.hypot((poi.lon - p.lon) * k, (poi.lat - p.lat) * 111_320);
+    if (d < bestD) {
+      bestD = d;
+      best = poi;
+    }
+  }
+  return best;
+}
 const CACHE_TTL = 30 * 24 * 3600 * 1000;
 
 function kindOf(tags: Record<string, string>): PoiKind | null {
@@ -94,11 +114,15 @@ export function createPoiProvider(baseUrl: string): PoiProvider {
     async load(signal) {
       try {
         const res = await fetch(`${baseUrl}data/pois.json`, { signal });
-        if (res.ok && res.headers.get('content-type')?.includes('json')) return (await res.json()) as Poi[];
+        if (res.ok && res.headers.get('content-type')?.includes('json')) {
+          lastLoaded = (await res.json()) as Poi[];
+          return lastLoaded;
+        }
       } catch {
         // pas de fichier statique
       }
-      return overpass.load(signal);
+      lastLoaded = await overpass.load(signal);
+      return lastLoaded;
     },
   };
 }

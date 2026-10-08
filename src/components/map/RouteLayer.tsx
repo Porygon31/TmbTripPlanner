@@ -105,7 +105,14 @@ function WaypointMarker({ wp, index, total, editable }: { wp: Waypoint; index: n
     [index],
   );
   return (
-    <Marker ref={ref} position={[wp.lat, wp.lon]} icon={waypointIcon(kind, label, editable)} draggable={editable} eventHandlers={handlers}>
+    <Marker
+      ref={ref}
+      position={[wp.lat, wp.lon]}
+      icon={waypointIcon(kind, label, editable)}
+      draggable={editable}
+      eventHandlers={handlers}
+      zIndexOffset={isStart ? 1000 : isEnd ? 500 : 0}
+    >
       <Popup>
         <div className="wp-popup" data-testid="waypoint-popup">
           <strong>{waypointLabel(route, index)}</strong>
