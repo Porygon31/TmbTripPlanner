@@ -28,6 +28,8 @@ test.describe('Carte et catalogue', () => {
     const stats = await openApp(page);
     await expect(page.locator('.leaflet-container')).toBeVisible();
     await expect.poll(() => stats.tiles).toBeGreaterThan(0);
+    // Les tuiles sont réellement affichées (une requête CORS refusée les laisserait vides).
+    await expect.poll(() => page.locator('.leaflet-tile-loaded').count()).toBeGreaterThan(0);
     // Le tracé est dessiné (rendu canvas) et le profil du TMB est affiché par défaut.
     await expect(page.locator('.leaflet-overlay-pane canvas')).toHaveCount(1);
     await expect(page.getByTestId('elevation-profile')).toBeVisible();

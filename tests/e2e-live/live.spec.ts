@@ -27,12 +27,13 @@ function haversine(a: { lat: number; lon: number }, b: { lat: number; lon: numbe
 }
 
 test('tous les fonds de carte et calques répondent', async ({ page }) => {
-  const statuses = new Map<string, number[]>();
-  page.on('response', (r) => {
-    if (r.request().resourceType() !== 'image') return;
-    const host = new URL(r.url()).host;
-    statuses.set(host, [...(statuses.get(host) ?? []), r.status()]);
-  });
+  const statuses = new Map<string, (number | string)[]>();
+  const record = (url: string, value: number | string) => {
+    const host = new URL(url).host;
+    statuses.set(host, [...(statuses.get(host) ?? []), value]);
+  };
+  page.on('response', (r) => r.request().resourceType() === 'image' && record(r.url(), r.status()));
+  page.on('requestfailed', (r) => r.resourceType() === 'image' && record(r.url(), r.failure()?.errorText ?? 'failed'));
   await open(page);
   await setView(page, 45.92, 6.87, 13);
   for (const b of [...BASEMAPS.slice(1), ...OVERLAYS]) {
@@ -46,7 +47,7 @@ test('tous les fonds de carte et calques répondent', async ({ page }) => {
   for (const b of [...BASEMAPS, ...OVERLAYS]) {
     const host = new URL(b.url.replace('{s}', 'a')).host.replace(/^a\./, '');
     const ok = [...statuses.entries()].some(([h, list]) => h.endsWith(host) && list.includes(200));
-    expect(ok, `${b.label} (${host}) : ${JSON.stringify([...statuses.entries()].filter(([h]) => h.endsWith(host)))}`).toBe(true);
+    expect.soft(ok, `${b.label} (${host}) : ${JSON.stringify([...statuses.entries()].filter(([h]) => h.endsWith(host))).slice(0, 300)}`).toBe(true);
   }
   await page.evaluate(() => window.__tmb.store.getState().setBasemap('topo'));
   await page.waitForTimeout(2000);

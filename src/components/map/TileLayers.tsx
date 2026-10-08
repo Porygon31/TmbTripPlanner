@@ -15,7 +15,6 @@ export function TileLayers() {
         maxNativeZoom={base.maxNativeZoom}
         maxZoom={19}
         subdomains={base.subdomains ?? 'abc'}
-        crossOrigin
       />
       {OVERLAYS.filter((o) => overlays[o.id]).map((o) => (
         <TileLayer
