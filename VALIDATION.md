@@ -26,3 +26,10 @@ Les limites d’exploitation et les procédures de configuration, actualisation 
 - Format 390 × 844 : aucun débordement horizontal, guide et navigation lisibles, fiche POI accessible avec repli de la légende, profil tactile synchronisé et validation de la manipulation. Le cadrage tient compte de la taille réelle de la carte et du panneau inférieur.
 
 Captures : `outputs/poi-add-validation.jpg`, `outputs/tutorial-desktop-validation.jpg` et `outputs/tutorial-mobile-validation.jpg`.
+
+## Clarification du tutoriel
+
+- Étape 8 : trois consignes numérotées précisent le bouton à cliquer, la portion classique remplacée et le résultat visible. Le message de réussite nomme le Col de Tricot et indique l’action suivante.
+- Étape GPX : le repère vise uniquement Exporter GPX. Bordure de 5 px avec pulsation d’opacité, bouton animé entre 100 % et 106 %, et nom en gras dans la consigne. Les animations sont désactivées par `prefers-reduced-motion` tout en conservant le cadre.
+- TypeScript validé. Navigateur : intégration et message de réussite, animations actives, retrait du repère au changement de chapitre et à la sortie ; contrôles et texte accessibles sans débordement à 390 × 844.
+- Captures : `outputs/tutorial-export-highlight.jpg` et `outputs/tutorial-export-highlight-mobile.jpg`.

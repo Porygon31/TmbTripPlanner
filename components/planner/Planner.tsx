@@ -459,7 +459,7 @@ export default function Planner() {
         <div className="top-caption">
           France <span>·</span> Italie <span>·</span> Suisse
         </div>
-        <div className="header-actions" data-tour="gpx">
+        <div className="header-actions">
           <Button id="open-tutorial" variant="outline" onClick={() => void startTutorial()} disabled={tutorialActive || startingTutorial || !catalog || !storage.ready || busy || enriching} aria-label="Ouvrir le tutoriel" title="Tutoriel interactif">
             <BookOpen /> Tutoriel
           </Button>
@@ -475,6 +475,8 @@ export default function Planner() {
             onClick={() => downloadGpx(route)}
             disabled={!route.segments.length || busy}
             title="Exporter GPX"
+            aria-label="Exporter GPX"
+            data-tour="gpx"
           >
             <Download />
             Exporter GPX
