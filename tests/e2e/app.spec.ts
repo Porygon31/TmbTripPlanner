@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { gpxToTrack, parseGpxString, type XmlParser } from '../../src/core/gpx/parse';
 import { computeStatistics } from '../../src/core/elevation/stats';
+import { installMocks } from './mocks';
 import { clickMap, junctionGap, maxGap, openApp, routeInfo, screenPoint, setView, waitRouted } from './helpers';
 
 const xml = new DOMParser() as unknown as XmlParser;
@@ -38,6 +39,16 @@ test.describe('Carte et catalogue', () => {
     await expect(card).toContainText('FIXTURE boucle principale');
     await expect(card.locator('[data-stat="distance"] dd')).toHaveText('76,4 km');
     await page.screenshot({ path: `${SHOTS}/desktop-accueil.png` });
+  });
+
+  test('fond de carte indisponible : bascule automatique sur la carte classique', async ({ page }) => {
+    await installMocks(page);
+    await page.route(/tile\.opentopomap\.org/, (route) => route.fulfill({ status: 503, body: 'indisponible' }));
+    await page.goto('/');
+    await page.getByTestId('disclaimer-accept').click();
+    await expect.poll(() => page.evaluate(() => window.__tmb?.store.getState().basemap)).toBe('osm');
+    await expect(page.locator('.toast')).toContainText('indisponible');
+    await expect.poll(() => page.locator('.leaflet-tile-loaded').count()).toBeGreaterThan(0);
   });
 
   test('clic sur le tracé : fiche avec distance, dénivelés et altitudes', async ({ page }) => {
