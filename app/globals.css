@@ -862,7 +862,7 @@ input:focus-visible {
   display: flex;
   gap: 10px;
 }
-.header-actions button {
+.header-actions [data-slot="button"] {
   height: 39px;
 }
 .workspace {
@@ -1302,7 +1302,8 @@ input:focus-visible {
   }
   .topbar {
     height: 65px;
-    padding: 0 14px;
+    padding: 0 12px;
+    gap: 8px;
   }
   .brand {
     font-size: 22px;
@@ -1314,16 +1315,18 @@ input:focus-visible {
   }
   .brand small {
     font-size: 7px;
+    letter-spacing: 1.3px;
   }
   .header-actions {
-    gap: 7px;
+    gap: 4px;
   }
-  .header-actions button {
+  .header-actions [data-slot="button"] {
     font-size: 0;
     width: 36px;
     padding: 0;
+    gap: 0;
   }
-  .header-actions button svg {
+  .header-actions [data-slot="button"] svg {
     width: 17px;
     height: 17px;
   }
@@ -1415,6 +1418,137 @@ input:focus-visible {
   .sidebar.collapsed .catalog-scroll {
     display: none;
   }
+}
+
+/* The welcome dialog stays above the map controls and the practice panel. */
+[data-slot="dialog-overlay"] { z-index: 1000; }
+[data-slot="dialog-content"] { z-index: 1001; }
+.welcome-dialog {
+  width: calc(100% - 32px);
+  max-width: 540px;
+  max-height: calc(100dvh - 32px);
+  overflow-y: auto;
+  gap: 20px;
+  padding: 32px;
+  border-radius: 18px;
+  border-color: #dce5dd;
+  color: #193f47;
+  box-shadow: 0 24px 90px #112f3940;
+}
+.welcome-emblem { display: grid; place-items: center; width: 58px; height: 58px; border-radius: 16px; background: #edf3ed; color: #426859; }
+.welcome-dialog [data-slot="dialog-header"] { text-align: left; gap: 10px; }
+.welcome-dialog [data-slot="dialog-title"] { font-size: 27px; line-height: 1.18; letter-spacing: -.7px; }
+.welcome-dialog [data-slot="dialog-title"]:focus { outline: none; }
+.welcome-dialog [data-slot="dialog-description"] { color: #647779; font-size: 15px; line-height: 1.65; }
+.welcome-topics { display: grid; gap: 13px; padding: 0; margin: 0; list-style: none; }
+.welcome-topics li { display: flex; align-items: center; gap: 12px; font-size: 14px; }
+.welcome-topics svg { width: 19px; height: 19px; flex-shrink: 0; color: #a96c41; }
+.welcome-reassurance { display: flex; align-items: flex-start; gap: 9px; margin: 0; padding: 13px; border-radius: 8px; background: #f1f5f0; font-size: 12px; line-height: 1.6; color: #506c59; }
+.welcome-reassurance svg { flex-shrink: 0; margin-top: 1px; }
+.welcome-actions { display: grid; gap: 9px; }
+.welcome-actions button { min-height: 43px; }
+.welcome-footer { color: #677c7a; font-size: 12px; line-height: 1.7; text-align: center; margin: 0; }
+.welcome-footer a { color: #193f47; text-decoration: underline; text-underline-offset: 3px; }
+.welcome-footer > span { display: block; margin-top: 5px; font-size: 11px; }
+
+.help-page { min-height: 100dvh; background: #fcfdfb; color: #203f45; }
+.help-topbar { position: sticky; top: 0; z-index: 10; }
+.help-header-label { font-size: 10px; font-weight: 600; letter-spacing: 2px; color: #71847b; }
+.help-skip { position: fixed; top: -80px; left: 24px; z-index: 20; padding: 12px; background: white; border: 1px solid #de7e51; }
+.help-skip:focus { top: 14px; }
+.help-layout { max-width: 1216px; margin: 0 auto; padding: 52px 32px 64px; display: grid; grid-template-columns: 248px minmax(0, 1fr); gap: 60px; align-items: start; }
+.help-sidebar { position: sticky; top: 108px; max-height: calc(100dvh - 132px); overflow-y: auto; scrollbar-width: thin; padding: 0 4px 8px 0; }
+.help-sidebar nav > p { padding: 4px 12px 15px; }
+.help-sidebar ol { list-style: none; padding: 0; margin: 0; }
+.help-sidebar li a { display: flex; align-items: baseline; gap: 11px; padding: 10px 12px; border-radius: 6px; font-size: 13px; line-height: 1.4; color: #526c6b; text-decoration: none; }
+.help-sidebar li a:hover { color: #193f47; background: #eaf0e9; }
+.help-sidebar li span { color: #929f93; font-size: 10px; font-variant-numeric: tabular-nums; }
+.help-practice { margin-top: 26px; padding: 20px; background: #eff4ed; border: 1px solid #dfe8d9; border-radius: 10px; }
+.help-practice > svg { color: #5d7c62; margin-bottom: 12px; }
+.help-practice strong { display: block; font-size: 15px; }
+.help-practice p { color: #62766c; line-height: 1.6; font-size: 12px; margin: 8px 0 14px; }
+.help-practice a { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 700; }
+.help-main { min-width: 0; }
+.help-hero { padding: 0 0 44px; }
+.help-hero h1 { margin: 15px 0 19px; font-size: clamp(32px, 3.1vw, 44px); line-height: 1.15; letter-spacing: -1.3px; font-weight: 700; color: #193f47; }
+.help-hero > p:not(.eyebrow) { font-size: 16px; line-height: 1.75; max-width: 630px; color: #657b77; }
+.help-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; margin-top: 26px; }
+.help-hero-actions > a:not([data-slot]) { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; text-decoration: underline; text-underline-offset: 4px; }
+.help-chapter { padding: 35px 0; border-top: 1px solid #dee6df; scroll-margin-top: 98px; font-size: 14px; line-height: 1.8; }
+.help-chapter:target .help-chapter-heading > span { color: #fff; background: #a96c41; }
+.help-chapter-heading { display: flex; align-items: center; gap: 13px; margin-bottom: 20px; }
+.help-chapter-heading > span { width: 33px; height: 33px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; background: #eef2ea; color: #698069; font-size: 11px; font-weight: 600; }
+.help-chapter h2 { margin: 0; font-size: 24px; letter-spacing: -.5px; font-weight: 650; line-height: 1.3; }
+.help-chapter h3 { display: flex; align-items: center; gap: 8px; margin: 24px 0 10px; font-size: 16px; font-weight: 600; }
+.help-chapter p { margin: 14px 0; color: #5c7271; }
+.help-chapter strong { font-weight: 600; color: #203f45; }
+.help-chapter a { color: #346950; text-decoration: underline; text-underline-offset: 3px; }
+.help-chapter ul, .help-chapter ol { padding-left: 23px; margin: 15px 0; color: #5c7271; }
+.help-chapter ul { list-style: disc; }
+.help-chapter ol { list-style: decimal; }
+.help-chapter li { padding-left: 4px; margin: 9px 0; }
+.help-chapter li::marker { color: #8b9b83; font-weight: 600; }
+.help-definitions { margin: 22px 0; }
+.help-definitions > div { display: grid; grid-template-columns: 155px 1fr; gap: 20px; padding: 14px 0; border-bottom: 1px solid #e8ede6; }
+.help-definitions dt { font-weight: 600; font-size: 13px; }
+.help-definitions dd { color: #5c7271; margin: 0; }
+.help-chapter .help-note { display: flex; align-items: flex-start; gap: 10px; background: #eef3ec; border-radius: 8px; padding: 16px; font-size: 13px; color: #536e57; }
+.help-note svg { flex-shrink: 0; margin-top: 3px; }
+.help-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.help-options > div { border: 1px solid #dce5da; border-radius: 10px; background: white; padding: 22px; }
+.help-options > div > svg { color: #628069; }
+.help-options h3 { margin-top: 13px; }
+.help-options p { font-size: 13px; margin-bottom: 0; }
+.help-chapter .help-poi-list { display: flex; gap: 10px 18px; flex-wrap: wrap; list-style: none; padding: 0; margin: 18px 0; }
+.help-poi-list li { display: flex; align-items: center; gap: 7px; padding: 0; margin: 0; font-size: 12px; }
+.help-example { margin: 24px 0; border-left: 3px solid #d6976c; padding: 16px 20px; background: #faf5ec; border-radius: 0 8px 8px 0; }
+.help-example > span { font-size: 10px; font-weight: 600; color: #a06e46; letter-spacing: 1px; }
+.help-example p { margin: 6px 0 0; font-size: 13px; }
+.help-chapter details { border: 1px solid #dfe7df; background: white; border-radius: 8px; margin: 10px 0; padding: 0 18px; }
+.help-chapter summary { cursor: pointer; font-size: 13px; font-weight: 600; padding: 16px 0; }
+.help-chapter details p { font-size: 13px; margin: 0 0 18px; }
+.help-footer { border-top: 1px solid #dee6df; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 28px; font-size: 13px; }
+#guide { scroll-margin-top: 104px; }
+@media (max-width: 1000px) {
+  .help-layout { padding: 36px 25px; grid-template-columns: 212px minmax(0, 1fr); gap: 32px; }
+  .help-options { grid-template-columns: 1fr; }
+  .help-definitions > div { grid-template-columns: 1fr; gap: 4px; }
+}
+@media (max-width: 700px) {
+  .welcome-dialog { padding: 25px 22px; gap: 17px; }
+  .welcome-dialog [data-slot="dialog-title"] { font-size: 24px; }
+  .welcome-dialog [data-slot="dialog-description"] { font-size: 14px; }
+  .welcome-topics li { font-size: 13px; }
+  .help-header-label { display: none; }
+  .help-topbar > [data-slot="button"] { font-size: 12px; padding: 8px; }
+  .help-topbar > [data-slot="button"] svg { display: none; }
+  .help-layout { display: flex; flex-direction: column; gap: 28px; padding: 24px 20px 40px; }
+  .help-sidebar { position: static; max-height: none; width: 100%; padding: 0 0 16px; border-bottom: 1px solid #dee6df; }
+  .help-sidebar nav > p { padding: 0 0 12px; }
+  .help-sidebar ol { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 2px 9px; }
+  .help-sidebar li a { padding: 7px 0; gap: 6px; font-size: 11px; }
+  .help-sidebar li span { font-size: 9px; }
+  .help-practice { display: none; }
+  .help-hero { padding-bottom: 28px; }
+  .help-hero h1 { font-size: 32px; letter-spacing: -.9px; }
+  .help-hero > p:not(.eyebrow) { font-size: 14px; }
+  .help-hero-actions { gap: 17px; margin-top: 22px; }
+  .help-chapter { padding: 27px 0; scroll-margin-top: 85px; }
+  .help-chapter h2 { font-size: 21px; }
+  .help-options > div { padding: 18px; }
+  .help-chapter-heading { gap: 10px; }
+}
+@media (max-width: 360px) {
+  .topbar .brand { font-size: 19px; gap: 5px; }
+  .topbar .brand small { display: none; }
+  .topbar .brand-icon { width: 29px; height: 33px; }
+  .header-actions [data-slot="button"] { width: 32px; }
+}
+@media print {
+  .help-topbar, .help-sidebar, .help-hero-actions, .help-footer { display: none; }
+  .help-layout { display: block; padding: 0; }
+  .help-page { background: white; }
+  .help-chapter { break-inside: avoid; }
 }
 .catalog-scroll { flex: 1; min-height: 0; }
 .app-shell.tutorial-active { display: flex; flex-direction: column; }

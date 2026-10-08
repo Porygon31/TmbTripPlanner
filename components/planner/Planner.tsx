@@ -32,6 +32,7 @@ import {
   Eye,
   Check,
   BookOpen,
+  CircleHelp,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -64,6 +65,7 @@ import { routingProvider } from "@/lib/tmb/routing";
 import { uid } from "@/lib/tmb/geo";
 import PoiLegend from "./PoiLegend";
 import Tutorial, { TUTORIAL_STEPS } from "./Tutorial";
+import WelcomeDialog from "./WelcomeDialog";
 import GpxWorker from "@/workers/gpx.worker?worker";
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
@@ -460,6 +462,9 @@ export default function Planner() {
           France <span>·</span> Italie <span>·</span> Suisse
         </div>
         <div className="header-actions">
+          <Button asChild variant="outline">
+            <a href="/aide" target="_blank" rel="noopener noreferrer" aria-label="Aide (nouvel onglet)" title="Guide d’utilisation — nouvel onglet"><CircleHelp /> Aide</a>
+          </Button>
           <Button id="open-tutorial" variant="outline" onClick={() => void startTutorial()} disabled={tutorialActive || startingTutorial || !catalog || !storage.ready || busy || enriching} aria-label="Ouvrir le tutoriel" title="Tutoriel interactif">
             <BookOpen /> Tutoriel
           </Button>
@@ -493,6 +498,7 @@ export default function Planner() {
           }}
         />
       </header>
+      <WelcomeDialog ready={!tutorialActive && !startingTutorial && !!catalog && storage.ready && !busy && !enriching} onStartTutorial={startTutorial} />
       <div className="workspace">
         <aside className={`sidebar ${panel}`}>
           <button

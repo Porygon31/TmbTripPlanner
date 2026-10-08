@@ -33,3 +33,11 @@ Captures : `outputs/poi-add-validation.jpg`, `outputs/tutorial-desktop-validatio
 - Étape GPX : le repère vise uniquement Exporter GPX. Bordure de 5 px avec pulsation d’opacité, bouton animé entre 100 % et 106 %, et nom en gras dans la consigne. Les animations sont désactivées par `prefers-reduced-motion` tout en conservant le cadre.
 - TypeScript validé. Navigateur : intégration et message de réussite, animations actives, retrait du repère au changement de chapitre et à la sortie ; contrôles et texte accessibles sans débordement à 390 × 844.
 - Captures : `outputs/tutorial-export-highlight.jpg` et `outputs/tutorial-export-highlight-mobile.jpg`.
+
+## Accueil de première visite et manuel
+
+- Fenêtre centrée au premier affichage de la carte, avec choix du tutoriel, exploration libre et lien vers le guide. Le titre nomme correctement la boîte de dialogue et reçoit le focus ; les contrôles restent accessibles sur petit écran grâce au défilement interne.
+- Navigateur : lancement du tutoriel depuis l’accueil, retour au parcours personnel de onze points, rechargement sans réafficher l’accueil ; démarrage depuis le lien du manuel après chargement du brouillon, puis restauration du parcours.
+- Aide ouverte dans un autre onglet depuis la barre de la carte. Douze chapitres, navigation par ancres sans titre masqué sous l’en-tête, questions fréquentes dépliables et lien vers le tutoriel vérifiés.
+- Contrôles visuels sur ordinateur, à 390 × 844 et accueil à 320 × 640. Pas de débordement horizontal ; les quatre commandes de la barre restent accessibles.
+- Captures locales : `outputs/welcome-desktop-validation.jpg`, `outputs/help-desktop-validation.jpg` et `outputs/welcome-mobile-validation.jpg`.
