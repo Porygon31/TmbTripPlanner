@@ -10,7 +10,7 @@ export default function PoiLegend({ layers, onChange, expanded, onToggle }: {
   onToggle: () => void;
 }) {
   return (
-    <section className="poi-legend" aria-label="Légende des points d’intérêt">
+    <section className="poi-legend" data-tour="poi" aria-label="Légende des points d’intérêt">
       <button className="poi-legend-heading" onClick={onToggle} aria-expanded={expanded} aria-controls="poi-legend-layers">
         <Layers size={16} aria-hidden="true" />
         <span>Points d’intérêt</span>

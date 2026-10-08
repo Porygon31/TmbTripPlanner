@@ -6,6 +6,7 @@ export function useProjectStorage(
   route: Route,
   replace: (r: Route, record?: boolean) => void,
   onNotice: (s: string) => void,
+  paused = false,
 ) {
   const [ready, setReady] = useState(false),
     [status, setStatus] = useState("Chargement du brouillon…");
@@ -37,7 +38,7 @@ export function useProjectStorage(
     };
   }, [replace, onNotice]);
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || paused) return;
     const save = () =>
       saveProject("draft", latest.current)
         .then(() => setStatus("Brouillon enregistré sur cet appareil"))
@@ -55,10 +56,16 @@ export function useProjectStorage(
       clearTimeout(timer);
       document.removeEventListener("visibilitychange", visibility);
     };
-  }, [route, ready]);
+  }, [route, ready, paused]);
   return {
-    status,
+    ready,
+    status: paused ? "Parcours d’essai · brouillon personnel préservé" : status,
+    flushDraft: () => saveProject("draft", latest.current),
     save: async () => {
+      if (paused) {
+        onNotice("Sauvegarde simulée : votre parcours personnel reste intact.");
+        return;
+      }
       try {
         await saveProject("saved", latest.current);
         onNotice("Parcours sauvegardé sur cet appareil.");
@@ -69,6 +76,10 @@ export function useProjectStorage(
       }
     },
     restore: async () => {
+      if (paused) {
+        onNotice("Quittez le tutoriel pour retrouver votre parcours personnel.");
+        return;
+      }
       try {
         const saved = await loadProject("saved");
         if (saved) {

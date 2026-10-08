@@ -31,6 +31,7 @@ import {
   ChevronDown,
   Eye,
   Check,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,9 +44,9 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRouteEditor } from "@/hooks/use-route-editor";
-import { conflicts } from "@/lib/tmb/catalog";
+import { conflicts, composeTmb, integrateVariant, splitSegment } from "@/lib/tmb/catalog";
 import { downloadGpx, parseGpx } from "@/lib/tmb/gpx";
-import { km, meters, statistics } from "@/lib/tmb/geo";
+import { km, meters, statistics, samePoint } from "@/lib/tmb/geo";
 import type {
   Catalog,
   Route,
@@ -53,6 +54,7 @@ import type {
   TmbVariant,
   RouteStatistics,
   Provenance,
+  PointOfInterest,
 } from "@/lib/tmb/types";
 import Profile from "./Profile";
 import { useAnalysis } from "@/hooks/use-analysis";
@@ -61,6 +63,7 @@ import { useWebMCP } from "@/hooks/use-webmcp";
 import { routingProvider } from "@/lib/tmb/routing";
 import { uid } from "@/lib/tmb/geo";
 import PoiLegend from "./PoiLegend";
+import Tutorial, { TUTORIAL_STEPS } from "./Tutorial";
 import GpxWorker from "@/workers/gpx.worker?worker";
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
@@ -131,13 +134,20 @@ export default function Planner() {
     [lon, setLon] = useState(""),
     [notice, setNotice] = useState(""),
     [locate, setLocate] = useState(0);
+  const [tutorialStep, setTutorialStep] = useState<number | null>(null);
+  const [tutorialEvents, setTutorialEvents] = useState<string[]>([]);
+  const [tutorialBaseline, setTutorialBaseline] = useState(0);
+  const [tutorialFocus, setTutorialFocus] = useState<RoutePoint[] | undefined>();
+  const [startingTutorial, setStartingTutorial] = useState(false);
+  const tutorialActive = tutorialStep !== null;
+  const tutorialUi = useRef<{ tab: string; mode: typeof mode; panel: typeof panel; base: string; visible: string[]; layers: string[]; poiExpanded: boolean; mobileProfile: boolean } | null>(null);
   const editor = useRouteEditor();
   const { route, busy, error, setError: reportError } = editor;
   const file = useRef<HTMLInputElement>(null);
   const mapWrap = useRef<HTMLDivElement>(null);
   const analysis = useAnalysis(route);
   const stat = analysis.stats;
-  const storage = useProjectStorage(route, editor.replace, setNotice);
+  const storage = useProjectStorage(route, editor.replace, setNotice, tutorialActive);
   const [layers, setLayers] = useState<string[]>([]),
     [poiExpanded, setPoiExpanded] = useState(true),
     [mobileProfile, setMobileProfile] = useState(false),
@@ -172,6 +182,88 @@ export default function Planner() {
       cancelled = true;
     };
   }, [reportError]);
+  const markTutorial = (event: string) => {
+    if (tutorialActive) setTutorialEvents(events => events.includes(event) ? events : [...events, event]);
+  };
+  const prepareTutorialStep = (index: number) => {
+    if (!catalog || busy) return;
+    const step = TUTORIAL_STEPS[index];
+    let trial = routeRef.current;
+    const tricot = catalog.variants.find(v => v.id === "9678267")!;
+    // Chapter navigation prepares only the isolated practice route.
+    if (index >= 6 && index <= 12 && trial.mode !== "tmb") trial = composeTmb(catalog, []);
+    if ((step.id === "insert" || step.id === "move") && !trial.variantIds.includes(tricot.id)) trial = integrateVariant(trial, tricot);
+    if (step.id === "move" && trial.segments.filter(s => s.variantId === tricot.id).length <= (tricot.pieces?.length ?? 1)) {
+      const segment = trial.segments.find(s => s.variantId === tricot.id && s.points.length > 2);
+      if (segment) trial = splitSegment(trial, segment.id, Math.floor(segment.points.length / 2));
+    }
+    if (trial !== routeRef.current) editor.replace(trial);
+    setTutorialBaseline(trial.waypoints.length);
+    setTutorialStep(index);
+    setTab(step.surface === "explore" ? "explore" : "route");
+    setPanel(step.surface === "route" || step.surface === "explore" ? "expanded" : "collapsed");
+    setMode(step.id === "insert" ? "insert" : step.id === "points" || step.id === "poi" ? "add" : "view");
+    setPoiExpanded(step.id === "poi");
+    setMobileProfile(step.id === "profile");
+    setHover(null);
+    setSelected(null);
+    setNotice("");
+    reportError("");
+    if (step.id === "poi") setLayers(["refuge"]);
+    else setLayers([]);
+    if (["preview", "variant", "insert", "move"].includes(step.id)) setTutorialFocus(tricot.points);
+    else if (step.id === "poi") setTutorialFocus([{ lat: 45.892, lon: 6.81 }, { lat: 45.855, lon: 6.755 }]);
+    else if (index <= 3) setTutorialFocus([{ lat: 45.894, lon: 6.807 }, { lat: 45.880, lon: 6.777 }]);
+    else setTutorialFocus(undefined);
+    setFit(value => value + 1);
+  };
+  const startTutorial = async () => {
+    if (tutorialActive || startingTutorial || !catalog || busy || enriching || !storage.ready) return;
+    setStartingTutorial(true);
+    try {
+      await storage.flushDraft();
+      tutorialUi.current = { tab, mode, panel, base, visible, layers, poiExpanded, mobileProfile };
+      editor.beginPractice();
+      setTutorialEvents([]);
+      setVisible([]);
+      setBase("osm");
+      prepareTutorialStep(0);
+    } catch {
+      reportError("Le brouillon ne peut pas être protégé dans ce navigateur. Libérez le stockage local pour lancer le tutoriel.");
+    } finally { setStartingTutorial(false); }
+  };
+  const closeTutorial = () => {
+    enrichController.current?.abort();
+    editor.endPractice();
+    setTutorialStep(null);
+    setTutorialFocus(undefined);
+    setImported(null);
+    setSource(null);
+    setOverlap(null);
+    setHover(null);
+    setSelected(null);
+    const ui = tutorialUi.current;
+    if (ui) {
+      setTab(ui.tab); setMode(ui.mode); setPanel(ui.panel); setBase(ui.base);
+      setVisible(ui.visible); setLayers(ui.layers); setPoiExpanded(ui.poiExpanded); setMobileProfile(ui.mobileProfile);
+    }
+    tutorialUi.current = null;
+    setFit(value => value + 1);
+    setNotice("Tutoriel terminé. Votre parcours personnel a été restauré.");
+    requestAnimationFrame(() => document.getElementById("open-tutorial")?.focus());
+  };
+  const tutorialId = tutorialStep === null ? null : TUTORIAL_STEPS[tutorialStep].id;
+  const tutorialComplete = tutorialId === "free" ? tutorialEvents.includes("free")
+    : tutorialId === "points" ? route.waypoints.length >= 2 && route.segments.length > 0
+    : tutorialId === "poi" ? tutorialEvents.includes("poi")
+    : tutorialId === "classic" ? route.mode === "tmb"
+    : tutorialId === "preview" ? visible.includes("9678267")
+    : tutorialId === "variant" ? route.variantIds.includes("9678267")
+    : tutorialId === "insert" ? route.waypoints.length > tutorialBaseline
+    : tutorialId === "move" ? tutorialEvents.includes("move")
+    : tutorialId === "stage" ? route.waypoints.some(w => w.stageEnd)
+    : tutorialId === "profile" ? hover !== null
+    : tutorialId === "save" ? tutorialEvents.includes("save") : true;
   const toggleVisible = (id: string) =>
     setVisible((x) =>
       x.includes(id) ? x.filter((i) => i !== id) : [...x, id],
@@ -234,6 +326,7 @@ export default function Planner() {
     editor.fresh();
     setTab("route");
     setMode("add");
+    markTutorial("free");
     setNotice(
       "Cliquez sur la carte pour placer votre départ, puis vos points de passage.",
     );
@@ -242,6 +335,24 @@ export default function Planner() {
     if (busy || enriching) return;
     if (mode === "add") editor.add(p);
     if (mode === "insert") editor.insert(p);
+  };
+  const addPoi = async (poi: PointOfInterest) => {
+    const last = routeRef.current.waypoints.at(-1);
+    if (busy || enriching || (last && samePoint(last, poi))) return;
+    setTab("route");
+    setMode("add");
+    setNotice("");
+    const added = await editor.add(
+      { lat: poi.lat, lon: poi.lon, ...(poi.ele === undefined ? {} : { ele: poi.ele }) },
+      poi.name,
+    );
+    if (added) {
+      setNotice(`${poi.name} ajouté au parcours.`);
+      markTutorial("poi");
+    }
+  };
+  const moveWaypoint = async (id: string, point: RoutePoint) => {
+    if (await editor.move(id, point)) markTutorial("move");
   };
   const reorder = (index: number, offset: number) => {
     const points = [...route.waypoints];
@@ -334,7 +445,7 @@ export default function Planner() {
     },
   });
   return (
-    <main className="app-shell" data-analysis-engine={analysis.engine}>
+    <main className={`app-shell ${tutorialActive ? "tutorial-active" : ""}`} data-analysis-engine={analysis.engine}>
       <header className="topbar">
         <Link className="brand" href="/">
           <span className="brand-icon">
@@ -348,7 +459,10 @@ export default function Planner() {
         <div className="top-caption">
           France <span>·</span> Italie <span>·</span> Suisse
         </div>
-        <div className="header-actions">
+        <div className="header-actions" data-tour="gpx">
+          <Button id="open-tutorial" variant="outline" onClick={() => void startTutorial()} disabled={tutorialActive || startingTutorial || !catalog || !storage.ready || busy || enriching} aria-label="Ouvrir le tutoriel" title="Tutoriel interactif">
+            <BookOpen /> Tutoriel
+          </Button>
           <Button
             variant="outline"
             onClick={() => file.current?.click()}
@@ -441,6 +555,7 @@ export default function Planner() {
                   </div>
                   <Button
                     className="w-full"
+                    data-tour="classic-start"
                     onClick={startClassic}
                     disabled={!catalog || busy}
                   >
@@ -458,7 +573,7 @@ export default function Planner() {
                   <span>5 VARIANTES</span>
                 </div>
                 {catalog?.variants.map((v) => (
-                  <article className="variant-card" key={v.id}>
+                  <article className="variant-card" key={v.id} data-tour={v.id === "9678267" ? "variant" : undefined}>
                     <div className="variant-title">
                       <span
                         className="route-dot"
@@ -516,6 +631,7 @@ export default function Planner() {
                 <Button
                   variant="outline"
                   className="w-full mt-5"
+                  data-tour="free-start"
                   onClick={startFree}
                 >
                   <Plus />
@@ -662,7 +778,7 @@ export default function Planner() {
                     </div>
                   </details>
                 )}
-                <ol className="waypoints">
+                <ol className="waypoints" data-tour="waypoints">
                   {route.waypoints.map((w, i) => (
                     <li key={w.id}>
                       <div className="waypoint-row">
@@ -786,7 +902,7 @@ export default function Planner() {
                               !Number.isFinite(+lon)
                             }
                             onClick={() =>
-                              editor.move(w.id, { lat: +lat, lon: +lon })
+                              moveWaypoint(w.id, { lat: +lat, lon: +lon })
                             }
                           >
                             Déplacer ce point
@@ -862,7 +978,7 @@ export default function Planner() {
                   </Button>
                 )}
                 <div className="route-actions">
-                  <Button onClick={() => void storage.save()} disabled={busy}>
+                  <Button data-tour="save" onClick={() => { void storage.save(); markTutorial("save"); }} disabled={busy}>
                     <Save />
                     Sauvegarder
                   </Button>
@@ -938,6 +1054,7 @@ export default function Planner() {
         >
           <div
             className={`map-wrap ${mode !== "view" ? "drawing" : ""}`}
+            data-tour="map"
             ref={mapWrap}
           >
             <MapView
@@ -946,10 +1063,14 @@ export default function Planner() {
               route={route}
               base={base}
               onPoint={mapClick}
-              onMove={editor.move}
+              onAddPoi={addPoi}
+              onPoiOpen={() => setPoiExpanded(false)}
+              addingPoi={busy || enriching}
+              onMove={moveWaypoint}
               hover={hover}
               onHover={setHover}
               fit={fit}
+              fitPoints={tutorialFocus}
               editing={!busy && !enriching}
               display={analysis.display}
               layers={layers}
@@ -961,7 +1082,7 @@ export default function Planner() {
               Massif du Mont-Blanc
               <span className="map-caption-secondary">45°50′ N · 6°52′ E</span>
             </div>
-            <div className="map-tools">
+            <div className="map-tools" data-tour="map-tools">
               <label>
                 <Map size={16} />
                 <select
@@ -1073,6 +1194,7 @@ export default function Planner() {
             Profil d’altitude
           </button>
           <div
+            data-tour="profile"
             className={
               "profile-panel " + (mobileProfile ? "mobile-visible" : "")
             }
@@ -1086,6 +1208,7 @@ export default function Planner() {
           </div>
         </section>
       </div>
+      {tutorialStep !== null && <Tutorial step={tutorialStep} complete={tutorialComplete} busy={busy || enriching} onChange={prepareTutorialStep} onClose={closeTutorial} />}
       <Dialog
         open={!!imported}
         onOpenChange={(open) => {

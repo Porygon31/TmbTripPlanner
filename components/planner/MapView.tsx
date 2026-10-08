@@ -12,8 +12,10 @@ import {
 import L from "leaflet";
 import { renderToStaticMarkup } from "react-dom/server";
 import { POI_CATEGORIES, PoiSymbol } from "./poi-categories";
+import { Plus, Check, LoaderCircle } from "lucide-react";
+import { samePoint } from "@/lib/tmb/geo";
 import { useEffect, useMemo, useState, useRef } from "react";
-import type { Catalog, MapProvider, Route, RoutePoint } from "@/lib/tmb/types";
+import type { Catalog, MapProvider, Route, RoutePoint, PointOfInterest } from "@/lib/tmb/types";
 export const providers: MapProvider[] = [
   {
     id: "topo",
@@ -45,10 +47,12 @@ function Events({
   onPoint,
   fit,
   route,
+  fitPoints,
 }: {
   onPoint: (p: RoutePoint) => void;
   fit: number;
   route: Route | null;
+  fitPoints?: RoutePoint[];
 }) {
   const lastFit = useRef(0);
   const map = useMapEvents({
@@ -57,12 +61,17 @@ function Events({
   useEffect(() => {
     if (!fit || fit === lastFit.current) return;
     lastFit.current = fit;
-    const p = route?.segments.flatMap((s) => coords(s.points));
-    if (p?.length)
-      map.fitBounds(L.latLngBounds(p), { padding: [45, 45], maxZoom: 14 });
-  }, [fit, map, route]);
+    map.invalidateSize({ pan: false });
+    const p = fitPoints ? coords(fitPoints) : route?.segments.flatMap((s) => coords(s.points));
+    if (p?.length) {
+      const mobile = map.getContainer().clientWidth <= 700;
+      map.fitBounds(L.latLngBounds(p), mobile
+        ? { paddingTopLeft: [35, 105], paddingBottomRight: [35, 145], maxZoom: 14, animate: false }
+        : { padding: [45, 45], maxZoom: 14, animate: false });
+    }
+  }, [fit, fitPoints, map, route]);
   useEffect(() => {
-    const r = new ResizeObserver(() => map.invalidateSize());
+    const r = new ResizeObserver(() => map.invalidateSize({ pan: false }));
     r.observe(map.getContainer());
     return () => r.disconnect();
   }, [map]);
@@ -91,17 +100,20 @@ function Location({
   }, [tick, map]);
   return null;
 }
-type Poi = RoutePoint & { id: string; name: string; type: string; url: string };
 export default function MapView({
   catalog,
   visible,
   route,
   base = "topo",
   onPoint = () => {},
+  onAddPoi,
+  onPoiOpen,
+  addingPoi = false,
   onMove = () => {},
   hover,
   onHover = () => {},
   fit = 0,
+  fitPoints,
   editing = false,
   locate = 0,
   onError = () => {},
@@ -113,10 +125,14 @@ export default function MapView({
   route: Route | null;
   base?: string;
   onPoint?: (p: RoutePoint) => void;
+  onAddPoi?: (poi: PointOfInterest) => void | Promise<void>;
+  onPoiOpen?: () => void;
+  addingPoi?: boolean;
   onMove?: (id: string, p: RoutePoint) => void;
   hover?: RoutePoint | null;
   onHover?: (p: RoutePoint) => void;
   fit?: number;
+  fitPoints?: RoutePoint[];
   editing?: boolean;
   locate?: number;
   onError?: (message: string) => void;
@@ -124,11 +140,12 @@ export default function MapView({
   layers?: string[];
 }) {
   const provider = providers.find((p) => p.id === base) ?? providers[0];
-  const [pois, setPois] = useState<Poi[]>([]);
+  const [pois, setPois] = useState<PointOfInterest[]>([]);
+  const lastWaypoint = route?.waypoints.at(-1);
   useEffect(() => {
     fetch("/data/pois.json")
       .then((r) => r.json())
-      .then((data) => setPois((data as { points: Poi[] }).points))
+      .then((data) => setPois((data as { points: PointOfInterest[] }).points))
       .catch(() => {});
   }, []);
   const lines = useMemo(
@@ -153,7 +170,7 @@ export default function MapView({
         attribution={provider.attribution}
         maxZoom={provider.maxZoom}
       />
-      <Events onPoint={onPoint} fit={fit} route={route} />
+      <Events onPoint={onPoint} fit={fit} route={route} fitPoints={fitPoints} />
       <Location tick={locate} onError={onError} />
       {catalog?.main.segments.map((s, i) => (
         <Polyline
@@ -196,6 +213,7 @@ export default function MapView({
         .map((p) => {
           const category = POI_CATEGORIES.find(c => c.id === p.type);
           if (!category) return null;
+          const alreadyLast = !!lastWaypoint && samePoint(lastWaypoint, p);
           return <Marker
             key={p.id}
             position={[p.lat, p.lon]}
@@ -204,9 +222,10 @@ export default function MapView({
             alt={`${category.singular} · ${p.name}`}
             zIndexOffset={-100}
             bubblingMouseEvents={false}
+            eventHandlers={{ click: () => onPoiOpen?.() }}
           >
             <Tooltip direction="top" offset={[0, -13]}>{p.name}</Tooltip>
-            <Popup>
+            <Popup className="poi-popup" minWidth={230} maxWidth={280} autoPanPaddingTopLeft={[16, 112]} autoPanPaddingBottomRight={[16, 90]}>
               <strong>{p.name}</strong>
               <p>
                 {category.singular} {p.ele === undefined ? "" : `· ${p.ele} m`}
@@ -214,6 +233,20 @@ export default function MapView({
               <a href={p.url} target="_blank" rel="noreferrer">
                 Source OpenStreetMap
               </a>
+              {onAddPoi && (
+                <button
+                  type="button"
+                  className="poi-add-button"
+                  disabled={addingPoi || alreadyLast}
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    void onAddPoi(p);
+                  }}
+                >
+                  {alreadyLast ? <Check size={16} /> : addingPoi ? <LoaderCircle size={16} className="spin" /> : <Plus size={16} />}
+                  {alreadyLast ? "Déjà en fin de parcours" : addingPoi ? "Calcul en cours…" : "Ajouter au parcours"}
+                </button>
+              )}
             </Popup>
           </Marker>;
         })}

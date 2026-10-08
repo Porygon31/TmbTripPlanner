@@ -27,6 +27,7 @@ export function useRouteEditor() {
   const current = useRef(route);
   const coordinator = useRef(new EditCoordinator());
   const actionVersion = useRef(0);
+  const practiceBackup = useRef<{ route: Route; history: Route[]; future: Route[] } | null>(null);
   const commit = useCallback((next: Route, record = true) => {
     const previous = current.current;
     if (record) {
@@ -55,13 +56,14 @@ export function useRouteEditor() {
       setBusy(true);
       setError("");
       try {
-        await coordinator.current.run(operation, commit);
+        return await coordinator.current.run(operation, commit);
       } catch (e) {
         if (
           version === actionVersion.current &&
           (e as Error).name !== "AbortError"
         )
           setError((e as Error).message);
+        return false;
       } finally {
         if (version === actionVersion.current) setBusy(false);
       }
@@ -85,12 +87,12 @@ export function useRouteEditor() {
     [change],
   );
   const add = useCallback(
-    (p: RoutePoint) => {
+    (p: RoutePoint, name?: string) => {
       const r = current.current;
-      const w = { ...p, id: uid(), name: `Point ${r.waypoints.length + 1}` };
+      const w = { ...p, id: uid(), name: name?.trim().slice(0, 120) || `Point ${r.waypoints.length + 1}` };
       if (!r.waypoints.length) {
         replace({ ...r, waypoints: [w] });
-        return;
+        return true;
       }
       return change([...r.waypoints, w]);
     },
@@ -228,5 +230,22 @@ export function useRouteEditor() {
     canRedo: !!future.length,
     classic: (c: Catalog) => replace(composeTmb(c, [])),
     fresh: () => replace(newRoute()),
+    beginPractice: () => {
+      if (practiceBackup.current) return;
+      practiceBackup.current = { route: current.current, history, future };
+      cancel();
+      commit({ ...newRoute(), name: "Parcours d’essai · Tutoriel" }, false);
+      setHistory([]);
+      setFuture([]);
+    },
+    endPractice: () => {
+      const saved = practiceBackup.current;
+      if (!saved) return;
+      cancel();
+      commit(saved.route, false);
+      setHistory(saved.history);
+      setFuture(saved.future);
+      practiceBackup.current = null;
+    },
   };
 }

@@ -258,6 +258,29 @@ body {
 .poi-symbol svg { width: 15px; height: 15px; }
 .poi-map-icon { background: transparent; border: 0; }
 .poi-map-icon:focus-visible .poi-symbol { outline: 3px solid #193f47; outline-offset: 2px; }
+.poi-popup .leaflet-popup-content { font-size: 14px; line-height: 1.5; }
+.poi-popup .leaflet-popup-content p { margin: 7px 0; }
+.poi-popup .leaflet-popup-content > a { font-size: 12px; }
+.poi-add-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 42px;
+  margin-top: 12px;
+  padding: 9px 12px;
+  border: 1px solid #193f47;
+  border-radius: 7px;
+  background: #193f47;
+  color: white;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+.poi-add-button:hover:not(:disabled) { background: #295964; }
+.poi-add-button:disabled { background: #edf3f1; border-color: #d2dfd9; color: #47675e; cursor: default; }
+.poi-add-button svg { flex-shrink: 0; }
 .map-wrap:fullscreen .poi-legend { bottom: 30px; }
 .coordinate-entry {
   font-size: 12px;
@@ -1394,6 +1417,61 @@ input:focus-visible {
   }
 }
 .catalog-scroll { flex: 1; min-height: 0; }
+.app-shell.tutorial-active { display: flex; flex-direction: column; }
+.tutorial-active .topbar { flex-shrink: 0; }
+.tutorial-active .workspace { flex: 1; height: auto; min-height: 0; }
+.tutorial-active .map-wrap { min-height: 160px; }
+.tutorial-panel {
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr) 215px;
+  gap: 28px;
+  padding: 20px 28px;
+  background: #fffdf8;
+  border-top: 3px solid #df8054;
+  box-shadow: 0 -3px 18px #193f4710;
+  z-index: 750;
+  color: #193f47;
+  max-height: 40dvh;
+  overflow-y: auto;
+}
+.tutorial-progress > span { display: flex; align-items: center; gap: 8px; color: #92704d; font-size: 10px; letter-spacing: 1.3px; font-weight: 700; }
+.tutorial-progress label { display: block; margin: 12px 0 5px; font-size: 11px; color: #657676; }
+.tutorial-progress select { width: 100%; font-size: 12px; background: white; border: 1px solid #d9e2d8; border-radius: 6px; padding: 8px 6px; }
+.tutorial-progress progress { width: 100%; height: 5px; margin-top: 10px; accent-color: #537763; }
+.tutorial-copy h2 { font-size: 20px; line-height: 1.25; font-weight: 700; margin: 0 0 8px; }
+.tutorial-copy h2:focus { outline: none; }
+.tutorial-copy p { font-size: 13px; line-height: 1.6; color: #5f7475; margin: 0; }
+.tutorial-copy .tutorial-task { color: #885329; font-size: 12px; font-weight: 600; margin-top: 10px; }
+.tutorial-task.complete { display: flex; align-items: center; gap: 6px; color: #426d4f; }
+.tutorial-navigation { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 12px; }
+.tutorial-navigation > div { display: flex; gap: 8px; }
+.tutorial-navigation .tutorial-close { display: flex; align-items: center; gap: 5px; color: #5f7475; font-size: 12px; min-height: 28px; }
+.tutorial-navigation .tutorial-skip { text-decoration: underline; color: #5f7475; font-size: 12px; min-height: 28px; }
+.tutorial-navigation button:disabled { opacity: .45; }
+.tutorial-highlight { outline: 3px solid #df8054 !important; outline-offset: -3px; }
+.map-wrap.tutorial-highlight::after { content: ""; position: absolute; inset: 0; border: 3px solid #df8054; z-index: 700; pointer-events: none; }
+@media (max-width: 1000px) {
+  .tutorial-panel { grid-template-columns: 180px minmax(0, 1fr); gap: 12px 20px; padding: 15px 20px; }
+  .tutorial-navigation { grid-column: 1 / -1; flex-direction: row; justify-content: flex-end; align-items: center; }
+  .tutorial-navigation .tutorial-close { margin-right: auto; }
+  .tutorial-copy h2 { font-size: 18px; }
+}
+@media (max-width: 700px) {
+  .tutorial-panel { display: flex; flex-direction: column; gap: 10px; padding: 12px 15px; max-height: 43dvh; }
+  .tutorial-progress { display: flex; align-items: center; gap: 10px; }
+  .tutorial-progress > span, .tutorial-progress progress { display: none; }
+  .tutorial-progress label { margin: 0; font-size: 10px; flex-shrink: 0; }
+  .tutorial-progress select { padding: 6px; min-width: 0; }
+  .tutorial-copy h2 { font-size: 17px; margin-bottom: 5px; }
+  .tutorial-copy p { font-size: 12px; line-height: 1.5; }
+  .tutorial-copy .tutorial-task { font-size: 11px; margin-top: 6px; }
+  .tutorial-navigation { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+  .tutorial-navigation > div { margin-left: auto; }
+  .tutorial-navigation > div button { min-height: 36px; font-size: 12px; padding: 6px 12px; }
+  .tutorial-navigation .tutorial-skip { width: 100%; text-align: right; min-height: 24px; }
+  .tutorial-active .map-notice { max-height: 70px; overflow-y: auto; }
+}
 @media (max-width: 700px) {
   .mobile-handle { flex-shrink: 0; height: 28px; min-height: 28px; }
   .mobile-profile-toggle { bottom: 246px; }

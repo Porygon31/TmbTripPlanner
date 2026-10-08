@@ -1,4 +1,10 @@
 export type RoutePoint = { lat: number; lon: number; ele?: number };
+export type PointOfInterest = RoutePoint & {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+};
 export type Provenance = {
   kind: "osm" | "routing" | "import";
   label: string;

@@ -14,3 +14,15 @@ Vérifications réalisées le 8 octobre 2026 dans le projet local, avant publica
 Captures locales de contrôle : `outputs/desktop-validation.jpg` et `outputs/mobile-validation.jpg` (non publiées). La publication est confirmée séparément par le statut natif Sites `succeeded` et son URL de production.
 
 Les limites d’exploitation et les procédures de configuration, actualisation des données et maintenance sont décrites dans [MAINTENANCE.md](MAINTENANCE.md).
+
+## Mise à jour : lieux et tutoriel interactif
+
+- TypeScript et les 20 tests automatiques passent après les changements d’édition et de stockage.
+- Bouton « Ajouter au parcours » vérifié dans la fiche d’un refuge : premier point sur mobile, puis ajout après deux points sur ordinateur. Nom et coordonnées conservés ; ajout consécutif du même lieu désactivé.
+- Calculs OpenRouteService réels dans le navigateur : parcours de 1,3 km aux Houches, puis prolongement jusqu’à l’Auberge de Bionnassay (8,4 km au total, deux segments et 479 points).
+- Guide de 15 chapitres parcouru sur ordinateur : création libre, POI, classique, comparaison et intégration de Tricot, insertion, déplacement, fin d’étape, profil et sauvegarde simulée. Le déplacement a modifié exactement deux segments, les neuf autres conservant leur identité ; annulation vérifiée.
+- Sortie par Terminer ou Échap : points, identifiants de segments et variantes d’origine restitués à l’identique. L’historique personnel Annuler / Rétablir est conservé.
+- Rechargement pendant le tutoriel : brouillon personnel restauré. La sauvegarde explicite antérieure reste identique après une sauvegarde simulée dans le guide, puis Nouveau parcours et Restaurer.
+- Format 390 × 844 : aucun débordement horizontal, guide et navigation lisibles, fiche POI accessible avec repli de la légende, profil tactile synchronisé et validation de la manipulation. Le cadrage tient compte de la taille réelle de la carte et du panneau inférieur.
+
+Captures : `outputs/poi-add-validation.jpg`, `outputs/tutorial-desktop-validation.jpg` et `outputs/tutorial-mobile-validation.jpg`.

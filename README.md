@@ -14,4 +14,8 @@ Préparer son Tour du Mont-Blanc : carte topographique, cinq variantes OSM, parc
 
 Sur mobile, agrandir ou réduire le panneau avec sa poignée. Le bouton **Profil d’altitude** ouvre le profil au-dessus du panneau réduit. Toucher le profil positionne le repère correspondant sur la carte.
 
+Le bouton **Tutoriel** dans la barre du haut ouvre un guide interactif de 15 chapitres : carte, parcours libre, lieux, classique, variantes, insertion et déplacement, étapes, profil, sauvegarde et GPX. Les commandes agissent sur un parcours d’essai isolé ; quitter ou terminer restitue le parcours et son historique. Pendant l’essai, la sauvegarde est simulée et le brouillon personnel reste protégé, y compris au rechargement. Les chapitres peuvent être choisis directement ou passés.
+
+Dans la légende en bas à droite de la carte, activer une catégorie puis cliquer sur un lieu et **Ajouter au parcours**. Le lieu devient un point nommé, relié au dernier point par un calcul pédestre. Un échec conserve le parcours valide ; un lieu déjà en dernière position ne peut pas être ajouté deux fois de suite. La légende se replie à l’ouverture de la fiche pour la laisser accessible sur mobile.
+
 Les tracés OSM ne sont pas une certification institutionnelle. Vérifier localement météo, neige, fermetures et praticabilité avant de partir.
