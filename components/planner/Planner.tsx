@@ -60,7 +60,7 @@ import { useProjectStorage } from "@/hooks/use-project-storage";
 import { useWebMCP } from "@/hooks/use-webmcp";
 import { routingProvider } from "@/lib/tmb/routing";
 import { uid } from "@/lib/tmb/geo";
-import { Checkbox } from "@/components/ui/checkbox";
+import PoiLegend from "./PoiLegend";
 import GpxWorker from "@/workers/gpx.worker?worker";
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
@@ -139,6 +139,7 @@ export default function Planner() {
   const stat = analysis.stats;
   const storage = useProjectStorage(route, editor.replace, setNotice);
   const [layers, setLayers] = useState<string[]>([]),
+    [poiExpanded, setPoiExpanded] = useState(true),
     [mobileProfile, setMobileProfile] = useState(false),
     [enriching, setEnriching] = useState(false);
   const routeRef = useRef(route);
@@ -386,7 +387,7 @@ export default function Planner() {
                 : "Agrandir le panneau"
             }
             onClick={() =>
-              setPanel(panel === "expanded" ? "collapsed" : "expanded")
+              { setPanel(panel === "expanded" ? "collapsed" : "expanded"); setPoiExpanded(false); }
             }
           />
           <div className="sidebar-intro">
@@ -897,34 +898,6 @@ export default function Planner() {
                 </div>
               </>
             )}
-            <details className="poi-controls">
-              <summary>
-                <Layers size={15} />
-                Points d’intérêt
-              </summary>
-              <p>Extrait OpenStreetMap intégré, non exhaustif.</p>
-              <div>
-                {[
-                  ["refuge", "Refuges"],
-                  ["col", "Cols"],
-                  ["sommet", "Sommets"],
-                  ["village", "Villages"],
-                  ["poi", "Points de vue"],
-                ].map(([id, label]) => (
-                  <label key={id}>
-                    <Checkbox
-                      checked={layers.includes(id)}
-                      onCheckedChange={(checked) =>
-                        setLayers((x) =>
-                          checked ? [...x, id] : x.filter((v) => v !== id),
-                        )
-                      }
-                    />
-                    {label}
-                  </label>
-                ))}
-              </div>
-            </details>
             <div className="safety-note">
               <Mountain size={18} />
               <p>
@@ -1075,6 +1048,15 @@ export default function Planner() {
               <span className="legend-line orange" />
               Votre parcours
             </div>
+            <PoiLegend
+              layers={layers}
+              expanded={poiExpanded}
+              onToggle={() => {
+                setPoiExpanded(!poiExpanded);
+                if (!poiExpanded && panel === "expanded") setPanel("collapsed");
+              }}
+              onChange={(id, checked) => setLayers(current => checked ? [...new Set([...current, id])] : current.filter(value => value !== id))}
+            />
           </div>
           <button
             className="mobile-profile-toggle"

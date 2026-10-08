@@ -6,9 +6,12 @@ import {
   useMapEvents,
   Marker,
   Popup,
+  Tooltip,
   CircleMarker,
 } from "react-leaflet";
 import L from "leaflet";
+import { renderToStaticMarkup } from "react-dom/server";
+import { POI_CATEGORIES, PoiSymbol } from "./poi-categories";
 import { useEffect, useMemo, useState, useRef } from "react";
 import type { Catalog, MapProvider, Route, RoutePoint } from "@/lib/tmb/types";
 export const providers: MapProvider[] = [
@@ -31,6 +34,13 @@ export const providers: MapProvider[] = [
 ];
 const coords = (points: RoutePoint[]) =>
   points.map((p) => [p.lat, p.lon] as [number, number]);
+const poiIcons = Object.fromEntries(POI_CATEGORIES.map(category => [category.id, L.divIcon({
+  className: `poi-map-icon poi-map-icon-${category.id}`,
+  html: renderToStaticMarkup(<PoiSymbol category={category} />),
+  iconSize: [26, 26],
+  iconAnchor: [13, 13],
+  popupAnchor: [0, -15],
+})]));
 function Events({
   onPoint,
   fit,
@@ -183,34 +193,30 @@ export default function MapView({
       ))}
       {pois
         .filter((p) => layers.includes(p.type))
-        .map((p) => (
-          <CircleMarker
+        .map((p) => {
+          const category = POI_CATEGORIES.find(c => c.id === p.type);
+          if (!category) return null;
+          return <Marker
             key={p.id}
-            center={[p.lat, p.lon]}
-            radius={p.type === "refuge" ? 6 : 4}
-            pathOptions={{
-              color: "white",
-              weight: 2,
-              fillColor:
-                p.type === "refuge"
-                  ? "#855246"
-                  : p.type === "sommet"
-                    ? "#52607b"
-                    : "#487c68",
-              fillOpacity: 1,
-            }}
+            position={[p.lat, p.lon]}
+            icon={poiIcons[p.type]}
+            title={`${category.singular} · ${p.name}`}
+            alt={`${category.singular} · ${p.name}`}
+            zIndexOffset={-100}
+            bubblingMouseEvents={false}
           >
+            <Tooltip direction="top" offset={[0, -13]}>{p.name}</Tooltip>
             <Popup>
               <strong>{p.name}</strong>
               <p>
-                {p.type} {p.ele === undefined ? "" : `· ${p.ele} m`}
+                {category.singular} {p.ele === undefined ? "" : `· ${p.ele} m`}
               </p>
               <a href={p.url} target="_blank" rel="noreferrer">
                 Source OpenStreetMap
               </a>
             </Popup>
-          </CircleMarker>
-        ))}
+          </Marker>;
+        })}
       {route?.waypoints.map((w, i) => (
         <Marker
           key={`${w.id}-${w.lat}-${w.lon}`}
