@@ -1,0 +1,15 @@
+node_modules/
+dist/
+dist-*/
+*.local
+.DS_Store
+
+# Généré par scripts/build-catalog.ts à partir de data/
+public/data/
+
+# Tests
+tests/.generated/
+test-results/
+playwright-report/
+playwright-report-live/
+coverage/

@@ -1,0 +1,32 @@
+{
+  "main": {
+    "file": "gpx/tmb-principal.gpx",
+    "name": "FIXTURE boucle principale",
+    "description": "Données synthétiques de test.",
+    "source": {
+      "label": "Fixture de test"
+    },
+    "direction": "counterclockwise"
+  },
+  "variants": [
+    {
+      "id": "fixture-col-nord",
+      "file": "gpx/variantes/fixture-col-nord.gpx",
+      "name": "FIXTURE variante nord",
+      "description": "Détour synthétique.",
+      "departureName": "Jonction A",
+      "rejoinName": "Jonction B",
+      "source": {
+        "label": "Fixture de test"
+      }
+    },
+    {
+      "id": "fixture-col-sud",
+      "file": "gpx/variantes/fixture-col-sud.gpx",
+      "name": "FIXTURE variante sud",
+      "description": null,
+      "difficulty": "T3",
+      "source": null
+    }
+  ]
+}

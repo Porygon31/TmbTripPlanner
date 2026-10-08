@@ -1,0 +1,93 @@
+{
+  "main": {
+    "file": "gpx/tmb-principal.gpx",
+    "name": "Tour du Mont-Blanc — itinéraire principal",
+    "description": "Boucle d'environ 170 km autour du massif du Mont-Blanc, à travers la France, l'Italie et la Suisse, traditionnellement parcourue dans le sens antihoraire au départ des Houches.",
+    "source": null,
+    "references": [
+      { "label": "Wikipédia — Tour du Mont-Blanc", "url": "https://fr.wikipedia.org/wiki/Tour_du_Mont-Blanc" },
+      { "label": "OpenStreetMap — super-relation 124456 (TMB)", "url": "https://www.openstreetmap.org/relation/124456" }
+    ],
+    "direction": "counterclockwise",
+    "startNear": null
+  },
+  "variants": [
+    {
+      "id": "col-de-tricot",
+      "file": "gpx/variantes/col-de-tricot.gpx",
+      "name": "Variante du Col de Tricot",
+      "description": "Quitte l'itinéraire classique pour franchir le Col de Tricot, au plus près du glacier de Bionnassay, puis descend très raide vers les chalets de Miage avant de rejoindre Le Truc.",
+      "source": null,
+      "references": [],
+      "difficulty": null,
+      "departureName": null,
+      "rejoinName": null
+    },
+    {
+      "id": "col-des-fours",
+      "file": "gpx/variantes/col-des-fours.gpx",
+      "name": "Variante du Col des Fours",
+      "description": "Évite le détour par Les Chapieux en passant par le Col des Fours, entre le refuge de la Croix du Bonhomme et La Ville des Glaciers. Descente raide sur schistes, névés fréquents en début de saison : par beau temps uniquement.",
+      "source": null,
+      "references": [{ "label": "Moon & Honey Travel — TMB étape 4", "url": "https://www.moonhoneytravel.com/tour-du-mont-blanc-stage-4/" }],
+      "difficulty": null,
+      "departureName": "Refuge de la Croix du Bonhomme",
+      "rejoinName": "La Ville des Glaciers"
+    },
+    {
+      "id": "tete-bernarda",
+      "file": "gpx/variantes/tete-bernarda.gpx",
+      "name": "Variante du Mont de la Saxe et de la Tête Bernarda",
+      "description": "Parcours de crête au-dessus de Courmayeur et du Val Ferret, entre le refuge Bertone et le refuge Bonatti, par le Mont de la Saxe, la Tête Bernarda, le Col Sapin et le Pas entre deux Sauts. Plus exigeant que le sentier en balcon ; aucun service entre les deux refuges ; à réserver au beau temps.",
+      "source": null,
+      "references": [{ "label": "Saint-Bernard — n° 26 Tour du Mont-Blanc", "url": "https://www.saint-bernard.ch/en/activities/no-26-tour-du-mont-blanc-2746/" }],
+      "difficulty": null,
+      "departureName": "Rifugio Bertone",
+      "rejoinName": "Rifugio Bonatti"
+    },
+    {
+      "id": "fenetre-d-arpette",
+      "file": "gpx/variantes/fenetre-d-arpette.gpx",
+      "name": "Variante de la Fenêtre d'Arpette",
+      "description": "Alternative haute à l'itinéraire de l'Alp Bovine entre Champex-Lac et Trient, par la Fenêtre d'Arpette (2 665 m). Montée finale très raide dans les blocs ; déconseillée par temps instable.",
+      "source": null,
+      "references": [{ "label": "Moon & Honey Travel — TMB étape 8", "url": "https://www.moonhoneytravel.com/tour-du-mont-blanc-stage-8/" }],
+      "difficulty": null,
+      "departureName": "Champex-Lac",
+      "rejoinName": null
+    },
+    {
+      "id": "les-grands",
+      "file": "gpx/variantes/les-grands.gpx",
+      "name": "Variante des Grands",
+      "description": "Entre Trient et le Col de Balme par le Chalet du Glacier et le refuge Les Grands, sous le glacier des Grands. Passage équipé d'un câble sur la partie la plus exposée.",
+      "source": null,
+      "references": [{ "label": "Walking Switzerland — walk 8105", "url": "https://www.walkingswitzerland.com/swiss-walk-8105" }],
+      "difficulty": null,
+      "departureName": null,
+      "rejoinName": "Col de Balme"
+    },
+    {
+      "id": "le-tour",
+      "file": "gpx/variantes/le-tour.gpx",
+      "name": "Variante du Tour",
+      "description": null,
+      "source": null,
+      "references": [],
+      "difficulty": null,
+      "departureName": null,
+      "rejoinName": null
+    },
+    {
+      "id": "vallorcine",
+      "file": "gpx/variantes/vallorcine.gpx",
+      "name": "Variante de Vallorcine",
+      "description": null,
+      "source": null,
+      "references": [{ "label": "OpenStreetMap — relation 9678726", "url": "https://www.openstreetmap.org/relation/9678726" }],
+      "difficulty": null,
+      "departureName": null,
+      "rejoinName": null
+    }
+  ]
+}

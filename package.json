@@ -1,0 +1,56 @@
+{
+  "name": "tmb-trip-planner",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Préparation d'itinéraires personnalisés autour du Tour du Mont-Blanc : tracé officiel, variantes, routage randonnée, profil altimétrique, import/export GPX.",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19"
+  },
+  "scripts": {
+    "dev": "npm run build:data && vite",
+    "build:data": "tsx scripts/build-catalog.ts",
+    "build": "npm run build:data && npm run typecheck && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.node.json --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "pretest:e2e": "vite build",
+    "pretest:e2e:live": "vite build",
+    "test:e2e": "playwright test -c playwright.config.ts",
+    "test:e2e:live": "playwright test -c playwright.live.config.ts",
+    "fetch:osm": "tsx scripts/fetch-osm-tmb.ts"
+  },
+  "dependencies": {
+    "@tmcw/togeojson": "7.1.2",
+    "@turf/turf": "7.4.0",
+    "idb-keyval": "6.3.0",
+    "leaflet": "1.9.4",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-leaflet": "5.0.0",
+    "uplot": "1.6.32",
+    "zustand": "5.0.15"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.56.1",
+    "@types/geojson": "7946.0.16",
+    "@types/leaflet": "1.9.22",
+    "@types/node": "22.19.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "@xmldom/xmldom": "0.9.12",
+    "eslint": "10.12.0",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "eslint-plugin-react-refresh": "0.5.7",
+    "globals": "17.13.0",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.1",
+    "vite": "8.3.3",
+    "vitest": "5.0.3"
+  }
+}
