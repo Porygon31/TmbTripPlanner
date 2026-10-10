@@ -1,47 +1,62 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import { ArrowRight, BookOpen, Map, Mountain, Route, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const WELCOME_SEEN = "tmb-atelier:welcome-seen:v1";
+const WELCOME_CHANGED = "tmb-welcome-changed";
+let welcomeSeenInSession = false;
+
+function subscribe(callback: () => void) {
+  window.addEventListener("storage", callback);
+  window.addEventListener("popstate", callback);
+  window.addEventListener(WELCOME_CHANGED, callback);
+  return () => {
+    window.removeEventListener("storage", callback);
+    window.removeEventListener("popstate", callback);
+    window.removeEventListener(WELCOME_CHANGED, callback);
+  };
+}
+
+function getEntrySnapshot() {
+  if (new URL(window.location.href).searchParams.get("tutoriel") === "1") return "tutorial";
+  if (welcomeSeenInSession) return "seen";
+  try { return localStorage.getItem(WELCOME_SEEN) === "1" ? "seen" : "welcome"; }
+  catch { return "welcome"; }
+}
+
+// Keep the server HTML and the first hydration render identical.
+const getServerSnapshot = () => "pending" as const;
 
 function rememberWelcome() {
+  welcomeSeenInSession = true;
   try { localStorage.setItem(WELCOME_SEEN, "1"); } catch { /* The map remains usable when browser storage is blocked. */ }
+  window.dispatchEvent(new Event(WELCOME_CHANGED));
 }
 
 export default function WelcomeDialog({ ready, onStartTutorial }: {
   ready: boolean;
   onStartTutorial: () => Promise<void>;
 }) {
-  const [open, setOpen] = useState(false);
-  const [requestedTutorial, setRequestedTutorial] = useState(false);
+  const entry = useSyncExternalStore(subscribe, getEntrySnapshot, getServerSnapshot);
+  const open = entry === "welcome";
   const handledRequest = useRef(false);
   const title = useRef<HTMLHeadingElement>(null);
 
   useEffect(() => {
-    const url = new URL(window.location.href);
-    if (url.searchParams.get("tutoriel") === "1") {
-      // Consume the help page's link once, after the catalogue and draft are ready.
-      url.searchParams.delete("tutoriel");
-      window.history.replaceState(window.history.state, "", url);
-      rememberWelcome();
-      setRequestedTutorial(true);
-      return;
-    }
-    try { setOpen(localStorage.getItem(WELCOME_SEEN) !== "1"); }
-    catch { setOpen(true); }
-  }, []);
-
-  useEffect(() => {
-    if (!requestedTutorial || !ready || handledRequest.current) return;
+    if (entry !== "tutorial" || !ready || handledRequest.current) return;
     handledRequest.current = true;
-    setRequestedTutorial(false);
+    // Consume the help page's link once, after the catalogue and draft are ready.
+    const url = new URL(window.location.href);
+    url.searchParams.delete("tutoriel");
+    window.history.replaceState(window.history.state, "", url);
+    rememberWelcome();
     void onStartTutorial();
-  }, [requestedTutorial, ready, onStartTutorial]);
+  }, [entry, ready, onStartTutorial]);
 
-  const dismiss = () => { rememberWelcome(); setOpen(false); };
+  const dismiss = rememberWelcome;
 
   return (
     <Dialog open={open} onOpenChange={value => { if (!value) dismiss(); }}>

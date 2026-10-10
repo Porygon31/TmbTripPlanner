@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { ArrowLeft, ArrowRight, BookOpen, Download, Map, Mountain, Route, ShieldCheck, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { POI_CATEGORIES, PoiSymbol } from "@/components/planner/poi-categories";
@@ -37,12 +38,12 @@ export default function HelpPage() {
     <div className="help-page">
       <a className="help-skip" href="#guide">Aller au guide</a>
       <header className="topbar help-topbar">
-        <a className="brand" href="/" aria-label="TMB Atelier — retour à la carte">
+        <Link className="brand" href="/" aria-label="TMB Atelier — retour à la carte">
           <span className="brand-icon"><Mountain size={25} /></span>
           <span>TMB <strong>Atelier</strong><small>LE TOUR COMMENCE ICI</small></span>
-        </a>
+        </Link>
         <span className="help-header-label">CENTRE D’AIDE</span>
-        <Button asChild variant="outline"><a href="/"><ArrowLeft /> Retour à la carte</a></Button>
+        <Button asChild variant="outline"><Link href="/"><ArrowLeft /> Retour à la carte</Link></Button>
       </header>
       <div className="help-layout">
         <aside className="help-sidebar">
@@ -54,7 +55,7 @@ export default function HelpPage() {
             <BookOpen size={22} aria-hidden="true" />
             <strong>Envie d’essayer ?</strong>
             <p>Apprenez avec les vraies commandes, sur un parcours d’essai.</p>
-            <a href="/?tutoriel=1">Lancer le tutoriel <ArrowRight size={15} /></a>
+            <Link href="/?tutoriel=1">Lancer le tutoriel <ArrowRight size={15} /></Link>
           </div>
         </aside>
         <main id="guide" className="help-main">
@@ -63,7 +64,7 @@ export default function HelpPage() {
             <h1>Un guide, du premier clic<br />au premier pas.</h1>
             <p>Retrouvez ici toutes les explications du tutoriel, à votre rythme. Choisissez un sujet dans le sommaire ou suivez le guide pour construire votre parcours de A à Z.</p>
             <div className="help-hero-actions">
-              <Button asChild><a href="/?tutoriel=1"><BookOpen /> Lancer le tutoriel interactif</a></Button>
+              <Button asChild><Link href="/?tutoriel=1"><BookOpen /> Lancer le tutoriel interactif</Link></Button>
               <a href="#parcours">Créer mon premier parcours <ArrowRight size={16} /></a>
             </div>
           </div>
@@ -190,7 +191,7 @@ export default function HelpPage() {
             <details><summary>Je ne retrouve pas mon parcours sauvegardé.</summary><p>Utilisez le même appareil et le même navigateur. Restaurer le dernier parcours rappelle la copie créée par Sauvegarder. Si le stockage a été effacé ou si vous changez d’appareil, importez votre GPX exporté.</p></details>
             <details><summary>Mon GPX ne s’importe pas ou le profil est incomplet.</summary><p>Vérifiez que le fichier contient une trace ou une route, ne dépasse pas 10 Mo ni 100 000 points et est au format GPX 1.0 ou 1.1. Certains GPX n’ont pas d’altitudes : utilisez Compléter les altitudes si proposé. Des segments discontinus restent séparés.</p></details>
             <details><summary>Une variante est déjà intégrée ou ne peut plus être retirée.</summary><p>Une même variante ne peut pas être ajoutée deux fois. Si vous avez déplacé ses points, utilisez Annuler pour revenir avant la personnalisation. En cas de chevauchement avec une autre variante, choisissez celle à conserver dans la fenêtre proposée.</p></details>
-            <details><summary>Comment revoir le tutoriel ?</summary><p>Le message de bienvenue ne s’affiche qu’à la première visite dans ce navigateur, tant que ses données sont conservées. Le bouton Tutoriel, représenté par un livre sur téléphone, reste disponible en haut de la carte. Vous pouvez aussi <a href="/?tutoriel=1">le lancer depuis cette page</a>.</p></details>
+            <details><summary>Comment revoir le tutoriel ?</summary><p>Le message de bienvenue ne s’affiche qu’à la première visite dans ce navigateur, tant que ses données sont conservées. Le bouton Tutoriel, représenté par un livre sur téléphone, reste disponible en haut de la carte. Vous pouvez aussi <Link href="/?tutoriel=1">le lancer depuis cette page</Link>.</p></details>
           </Chapter>
 
           <Chapter index={11}>
@@ -198,7 +199,7 @@ export default function HelpPage() {
             <p>Vérifiez la météo, la neige, les fermetures et l’état des sentiers auprès des acteurs locaux avant de partir. Le site ne fournit pas de suivi en temps réel de ces conditions et ne remplace pas une préparation sur le terrain.</p>
             <p>Une connexion Internet est nécessaire pour charger les fonds de carte et calculer les itinéraires. Cette version ne télécharge pas de cartes pour une utilisation hors connexion.</p>
           </Chapter>
-          <footer className="help-footer"><a href="#guide">Revenir en haut ↑</a><Button asChild><a href="/"><Map /> Ouvrir la carte</a></Button></footer>
+          <footer className="help-footer"><a href="#guide">Revenir en haut ↑</a><Button asChild><Link href="/"><Map /> Ouvrir la carte</Link></Button></footer>
         </main>
       </div>
     </div>

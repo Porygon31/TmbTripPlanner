@@ -1,5 +1,20 @@
 # Validation de TMB Atelier
 
+## Contrôle complet du 10 octobre 2026
+
+- 20 tests automatiques réussis ; TypeScript et ESLint sans erreur après correction de sept erreurs de lint (liens internes du manuel et initialisation de l’accueil). L’accueil utilise un instantané compatible avec le rendu serveur et conserve son état en mémoire si le stockage est indisponible. Le marqueur temporaire de prévisualisation a été retiré des métadonnées.
+- Intégrité des fichiers : 29 JSON et 17 scripts JS/MJS valides ; empreintes des six GPX source conformes au catalogue. La clé ORS configurée est absente des fichiers client compilés. Le `.gitignore` exclut les secrets, caches et exports ; le cache TypeScript n’est plus suivi.
+- API réelles, via le serveur local : routage `foot-hiking` près des Houches (123 points avec altitude, 2,228 km) et enrichissement altimétrique de deux points (HTTP 200). Le déplacement d’un repère dans le navigateur recalcule le trajet (115 points), puis Annuler restitue les 123 points d’origine.
+- Navigateur ordinateur : fonds Relief et Classique chargés, combinaison de Tricot et du Col des Fours, profil synchronisé avec un marqueur sur la carte, sauvegarde puis nouveau parcours et restauration identique.
+- Export navigateur puis import par le sélecteur de fichiers : 16 889 points, 11 segments et 164,461 km conservés, avec les mêmes statistiques. Le fichier téléchargé passe le schéma officiel GPX 1.1 ; un aller-retour supplémentaire compare exactement chaque coordonnée, altitude, ordre et séparation de segment.
+- Accueil de première visite : fermeture et rechargement sans réapparition. Tutoriel : intégration de Tricot à l’étape 8 et restauration exacte du parcours personnel en quittant. Lancement depuis le manuel avec `?tutoriel=1` après restauration du brouillon ; la fenêtre d’accueil reste masquée et la sortie rend les 22 repères et 11 segments importés.
+- Format 390 × 844 : carte, légende, profil tactile et manuel sans débordement horizontal. Ajout de l’Auberge de Bionnassay depuis sa fiche, conservation de son nom et de ses coordonnées, bouton désactivé pour éviter l’ajout consécutif du même lieu. Brouillon retrouvé après rechargement.
+- Aucun avertissement ou erreur console relevé durant ces parcours navigateur. Captures locales : `outputs/full-audit-desktop.png` et `outputs/full-audit-mobile.png`.
+
+Ces contrôles couvrent les scénarios indiqués, sans garantir tous les appareils et toutes les données possibles. Les quotas, pannes et réponses tardives sont vérifiés par les tests simulés ; les services cartographiques et OpenRouteService restent des dépendances externes. Les autorisations de géolocalisation n’ont pas été demandées pendant cet audit.
+
+## Validation initiale
+
 Vérifications réalisées le 8 octobre 2026 dans le projet local, avant publication.
 
 - MVP validé avant les fonctions secondaires : 13 tests initiaux, contrôle du classique, ajout de Tricot, export navigateur et réimport.
