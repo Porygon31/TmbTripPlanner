@@ -16,7 +16,7 @@ import { POI_CATEGORIES, PoiSymbol, TMB_START_POI_ID } from "./poi-categories";
 import { Plus, Check, LoaderCircle } from "lucide-react";
 import { samePoint } from "@/lib/tmb/geo";
 import { routeStops } from "@/lib/tmb/loop";
-import { useEffect, useMemo, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef, type ComponentProps, type CSSProperties } from "react";
 import type { Catalog, MapProvider, Route, RoutePoint, PointOfInterest } from "@/lib/tmb/types";
 export const providers: MapProvider[] = [
   {
@@ -38,22 +38,45 @@ export const providers: MapProvider[] = [
 ];
 const coords = (points: RoutePoint[]) =>
   points.map((p) => [p.lat, p.lon] as [number, number]);
-const poiIcons = Object.fromEntries(POI_CATEGORIES.map(category => [category.id, L.divIcon({
+const poiIcons = Object.fromEntries(POI_CATEGORIES.filter(category => category.id !== "start").map(category => [category.id, L.divIcon({
   className: `poi-map-icon poi-map-icon-${category.id}`,
   html: renderToStaticMarkup(<PoiSymbol category={category} />),
-  iconSize: category.id === "start" ? [46, 58] : [26, 26],
-  iconAnchor: category.id === "start" ? [23, 58] : [13, 13],
-  popupAnchor: category.id === "start" ? [0, -55] : [0, -15],
+  iconSize: [26, 26],
+  iconAnchor: [13, 13],
+  popupAnchor: [0, -15],
 })]));
-function HouchesLabel({ name }: { name: string }) {
+function HouchesMarker({ name, children, ...props }: Omit<ComponentProps<typeof Marker>, "icon"> & { name: string }) {
   const map = useMap();
   const [compact, setCompact] = useState(() => map.getSize().x <= 700);
-  useMapEvents({ resize: () => setCompact(map.getSize().x <= 700) });
+  const [zoom, setZoom] = useState(() => map.getZoom());
+  // Keep listeners attached while the route's effect fits the map to its bounds.
+  const mapEvents = useMemo(() => ({
+    resize: () => setCompact(map.getSize().x <= 700),
+    zoomend: () => setZoom(map.getZoom()),
+  }), [map]);
+  useMapEvents(mapEvents);
+  // Full size nearby (zoom 12+), half size on distant views (zoom 8 and below).
+  const scale = 0.5 + Math.max(0, Math.min(4, zoom - 8)) / 8;
+  const sizeStyle = { "--tmb-start-scale": scale } as CSSProperties;
+  const icon = useMemo(() => L.divIcon({
+    className: "poi-map-icon poi-map-icon-start",
+    html: renderToStaticMarkup(<div style={{ "--tmb-start-scale": scale } as CSSProperties}>
+      <PoiSymbol category={POI_CATEGORIES[0]} />
+    </div>),
+    iconSize: [46 * scale, 58 * scale],
+    iconAnchor: [23 * scale, 58 * scale],
+    popupAnchor: [0, -55 * scale],
+  }), [scale]);
   return (
-    <Tooltip key={compact ? "bottom" : "left"} direction={compact ? "bottom" : "left"}
-      offset={compact ? [0, 16] : [-30, -20]} permanent opacity={1} className="tmb-start-label">
-      <strong>{name}</strong><span>Départ du TMB classique</span>
-    </Tooltip>
+    <Marker {...props} icon={icon}>
+      <Tooltip key={`${compact}-${scale}`} direction={compact ? "bottom" : "left"}
+        offset={compact ? [0, 16 * scale] : [-30 * scale, -20 * scale]} permanent opacity={1} className="tmb-start-label">
+        <div className="tmb-start-content" style={sizeStyle}>
+          <strong>{name}</strong><span>Départ du TMB classique</span>
+        </div>
+      </Tooltip>
+      {children}
+    </Marker>
   );
 }
 function Events({
@@ -229,19 +252,15 @@ export default function MapView({
           const category = POI_CATEGORIES.find(c => c.id === (isStart ? "start" : p.type));
           if (!category) return null;
           const alreadyLast = !!lastWaypoint && samePoint(lastWaypoint, p);
-          return <Marker
-            key={p.id}
-            position={[p.lat, p.lon]}
-            icon={poiIcons[category.id]}
-            title={`${category.singular} · ${p.name}`}
-            alt={`${category.singular} · ${p.name}`}
-            zIndexOffset={isStart ? 500 : -100}
-            bubblingMouseEvents={false}
-            eventHandlers={{ click: () => onPoiOpen?.() }}
-          >
-            {isStart ? <HouchesLabel name={p.name} /> :
-              <Tooltip direction="top" offset={[0, -13]}>{p.name}</Tooltip>}
-            <Popup className="poi-popup" minWidth={230} maxWidth={280} autoPanPaddingTopLeft={[16, 112]} autoPanPaddingBottomRight={[16, 90]}>
+          const markerProps = {
+            position: [p.lat, p.lon] as [number, number],
+            title: `${category.singular} · ${p.name}`,
+            alt: `${category.singular} · ${p.name}`,
+            zIndexOffset: isStart ? 500 : -100,
+            bubblingMouseEvents: false,
+            eventHandlers: { click: () => onPoiOpen?.() },
+          };
+          const popup = <Popup className="poi-popup" minWidth={230} maxWidth={280} autoPanPaddingTopLeft={[16, 112]} autoPanPaddingBottomRight={[16, 90]}>
               <strong>{p.name}</strong>
               <p>
                 {category.singular} {p.ele === undefined ? "" : `· ${p.ele} m`}
@@ -263,8 +282,13 @@ export default function MapView({
                   {alreadyLast ? "Déjà en fin de parcours" : addingPoi ? "Calcul en cours…" : "Ajouter au parcours"}
                 </button>
               )}
-            </Popup>
-          </Marker>;
+            </Popup>;
+          return isStart ?
+            <HouchesMarker key={p.id} {...markerProps} name={p.name}>{popup}</HouchesMarker> :
+            <Marker key={p.id} {...markerProps} icon={poiIcons[category.id]}>
+              <Tooltip direction="top" offset={[0, -13]}>{p.name}</Tooltip>
+              {popup}
+            </Marker>;
         })}
       {stops.map((w, i) => (
         <Marker
