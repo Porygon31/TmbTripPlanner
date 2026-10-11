@@ -38,6 +38,8 @@ export type Route = {
   waypoints: Waypoint[];
   segments: RouteSegment[];
   variantIds: string[];
+  /** The final waypoint is linked to the first; its id is reserved before the first leg exists. */
+  roundTrip?: { arrivalId: string };
   updatedAt: string;
 };
 export type ElevationPoint = RoutePoint & {

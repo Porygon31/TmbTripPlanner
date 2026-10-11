@@ -12,6 +12,7 @@ import {
 import { distance, length, statistics } from "../lib/tmb/geo";
 import { exportGpx, parseGpx } from "../lib/tmb/gpx";
 import { EditCoordinator, recalculate } from "../lib/tmb/editor";
+import * as routeEditor from "../lib/tmb/editor";
 import {dailyStatistics}from'../lib/tmb/stages';
 import {validateStoredRoute}from'../lib/tmb/storage';
 import type { Catalog, RoutePoint, RoutingProvider } from "../lib/tmb/types";
@@ -257,4 +258,152 @@ test("catalog difficulty and imported attribution retain their actual sources", 
   assert.match(catalog.variants.find(v => v.id === '9678380')!.difficulty, /SAC T4/);
   const r = parseGpx('<gpx version="1.1"><metadata><copyright author="Auteur"><year>2026</year><license>https://example.org/licence</license></copyright></metadata><trk><trkseg><trkpt lat="45" lon="6"/></trkseg></trk></gpx>', 'attribution.gpx', parser);
   assert.match(exportGpx(r), /Auteur — 2026 — https:\/\/example.org\/licence/);
+});
+
+test("the classic TMB links its existing arrival to the first waypoint", () => {
+  const route = composeTmb(catalog, [catalog.variants[0].id]);
+  assert.equal(route.roundTrip?.arrivalId, route.waypoints.at(-1)!.id);
+  assert.ok(distance(route.waypoints[0], route.waypoints.at(-1)!) < 0.01);
+  assert.equal(route.waypoints.length, route.segments.length + 1);
+});
+
+const recordingProvider = () => {
+  const calls: RoutePoint[][] = [];
+  const provider: RoutingProvider = {
+    route: async (a, b) => {
+      calls.push([a, b]);
+      // Include an intermediate point to verify the complete routed return is kept.
+      return [a, { lat: (a.lat + b.lat) / 2, lon: a.lon + 0.001, ele: 1234 }, b];
+    },
+    elevation: async points => points,
+  };
+  return { calls, provider };
+};
+
+test("closing a route routes only its return and exports that complete geometry", async () => {
+  const original = makeRoute(), { calls, provider } = recordingProvider();
+  const closed = await routeEditor.setRoundTrip(original, true, provider);
+  assert.equal(calls.length, 1);
+  assert.deepEqual(calls[0][0], original.waypoints.at(-1));
+  assert.equal(calls[0][1].lat, original.waypoints[0].lat);
+  assert.equal(closed.waypoints.length, original.waypoints.length + 1);
+  original.segments.forEach((segment, i) => assert.equal(closed.segments[i], segment));
+  assert.equal(closed.segments.at(-1)!.source.kind, "routing");
+  assert.equal(await routeEditor.setRoundTrip(closed, true, provider), closed);
+  const exported = parseGpx(exportGpx(closed), "closed.gpx", parser);
+  assert.deepEqual(exported.segments.map(s => s.points), closed.segments.map(s => s.points.map(({ lat, lon, ele }) => ({ lat, lon, ...(ele === undefined ? {} : { ele }) }))));
+  assert.ok(statistics(closed.segments).distance > statistics(original.segments).distance);
+  const reopened = await routeEditor.setRoundTrip(closed, false, provider);
+  assert.equal(reopened.roundTrip, undefined);
+  assert.deepEqual(reopened.waypoints, original.waypoints);
+  assert.deepEqual(reopened.segments, original.segments);
+  assert.equal(calls.length, 1);
+});
+
+test("a single departure can be linked before adding stops without a zero-length leg", async () => {
+  const route = newRoute(), { calls, provider } = recordingProvider();
+  route.waypoints = [makeRoute().waypoints[0]];
+  const linked = await routeEditor.setRoundTrip(route, true, provider);
+  assert.ok(linked.roundTrip);
+  assert.equal(linked.waypoints.length, 1);
+  assert.equal(linked.segments.length, 0);
+  assert.equal(calls.length, 0);
+  const withStop = await recalculate(linked, [...linked.waypoints, makeRoute().waypoints[1]], provider);
+  assert.equal(calls.length, 2);
+  assert.equal(withStop.waypoints.length, 3);
+  assert.equal(withStop.waypoints.at(-1)!.id, linked.roundTrip!.arrivalId);
+  const reduced = await recalculate(withStop, [withStop.waypoints[0]], provider);
+  assert.equal(reduced.waypoints.length, 1);
+  assert.equal(reduced.segments.length, 0);
+  assert.equal(calls.length, 2);
+});
+
+test("moving a linked departure recalculates only outgoing and returning legs", async () => {
+  const { calls, provider } = recordingProvider();
+  const closed = await routeEditor.setRoundTrip(makeRoute(), true, provider);
+  calls.length = 0;
+  const moved = await recalculate(closed, closed.waypoints.map((w, i) => i ? w : { ...w, lon: 6.81, name: "Nouveau départ" }), provider);
+  assert.equal(calls.length, 2);
+  assert.equal(moved.waypoints.at(-1)!.lon, 6.81);
+  assert.match(moved.waypoints.at(-1)!.name, /Nouveau départ/);
+  assert.equal(moved.roundTrip!.arrivalId, closed.roundTrip!.arrivalId);
+  for (let i = 1; i < closed.segments.length - 1; i++) assert.equal(moved.segments[i], closed.segments[i]);
+});
+
+test("added stops, reordering and deletion keep the linked arrival last", async () => {
+  const { calls, provider } = recordingProvider();
+  const closed = await routeEditor.setRoundTrip(makeRoute(), true, provider);
+  calls.length = 0;
+  const added = await recalculate(closed, [...closed.waypoints, { ...p(45.87), id: "extra", name: "Détour" }], provider);
+  assert.equal(calls.length, 2);
+  assert.equal(added.waypoints.at(-2)!.id, "extra");
+  assert.equal(added.waypoints.at(-1)!.id, closed.roundTrip!.arrivalId);
+  closed.segments.slice(0, -1).forEach((s, i) => assert.equal(added.segments[i], s));
+  const reordered = await recalculate(added, [added.waypoints[1], added.waypoints[0], ...added.waypoints.slice(2)], provider);
+  assert.equal(reordered.waypoints.at(-1)!.lat, reordered.waypoints[0].lat);
+  const deleted = await recalculate(reordered, reordered.waypoints.slice(1), provider);
+  assert.equal(deleted.waypoints.at(-1)!.lat, deleted.waypoints[0].lat);
+});
+
+test("enabling an already closed GPX keeps its segments and gaps exactly", async () => {
+  const imported = parseGpx('<gpx version="1.1"><trk><trkseg><trkpt lat="45.8" lon="6.8"/><trkpt lat="45.81" lon="6.8"/></trkseg><trkseg><trkpt lat="45.9" lon="6.8"/><trkpt lat="45.8" lon="6.8"/></trkseg></trk></gpx>', "closed.gpx", parser);
+  const { calls, provider } = recordingProvider();
+  const result = await routeEditor.setRoundTrip(imported, true, provider);
+  assert.deepEqual(result.segments, imported.segments);
+  assert.equal(result.waypoints.length, imported.waypoints.length);
+  assert.equal(calls.length, 0);
+});
+
+test("a failed or cancelled closure cannot overwrite the last valid route", async () => {
+  const original = makeRoute(), before = JSON.stringify(original);
+  const failing: RoutingProvider = { route: async () => { throw Error("quota"); }, elevation: async p => p };
+  await assert.rejects(routeEditor.setRoundTrip(original, true, failing), /quota/);
+  assert.equal(JSON.stringify(original), before);
+  const coordinator = new EditCoordinator();
+  let finish!: (points: RoutePoint[]) => void;
+  let committed = original;
+  const pending = coordinator.run(signal => routeEditor.setRoundTrip(original, true, { ...failing, route: () => new Promise(resolve => { finish = resolve; }) }, signal), result => { committed = result; });
+  coordinator.cancel();
+  finish([original.waypoints.at(-1)!, original.waypoints[0]]);
+  await assert.rejects(pending, { name: "AbortError" });
+  assert.equal(committed, original);
+});
+
+test("linked arrival metadata survives storage and malformed links are rejected", async () => {
+  const { provider } = recordingProvider();
+  const route = await routeEditor.setRoundTrip(makeRoute(), true, provider);
+  const stored = JSON.parse(JSON.stringify({ version: 1, route, savedAt: "" }));
+  assert.deepEqual(validateStoredRoute(stored), JSON.parse(JSON.stringify(route)));
+  stored.route.roundTrip.arrivalId = stored.route.waypoints[1].id;
+  assert.equal(validateStoredRoute(stored), null);
+});
+
+test("appending a variant inserts it before the return and keeps other source geometry", async () => {
+  const { calls, provider } = recordingProvider();
+  const route = await routeEditor.setRoundTrip(makeRoute(), true, provider);
+  calls.length = 0;
+  const variant = catalog.variants[0];
+  const result = await routeEditor.appendVariant(route, variant, provider);
+  assert.equal(calls.length, 2); // Connection to the variant, then return to departure.
+  assert.equal(calls[0][0].lat, route.waypoints.at(-2)!.lat);
+  assert.equal(result.waypoints.at(-1)!.id, route.roundTrip!.arrivalId);
+  assert.equal(result.waypoints.at(-1)!.lat, result.waypoints[0].lat);
+  route.segments.slice(0, -1).forEach((s, i) => assert.equal(result.segments[i], s));
+  assert.ok(result.segments.some(s => s.variantId === variant.id && s.source.kind === "osm"));
+  const before = JSON.stringify(route);
+  let request = 0;
+  await assert.rejects(routeEditor.appendVariant(route, variant, {
+    ...provider, route: async (a, b) => { if (++request === 2) throw Error("return failed"); return [a, b]; },
+  }), /return failed/);
+  assert.equal(JSON.stringify(route), before);
+});
+
+test("a single closed imported segment is preserved when linking its departure", async () => {
+  const route = parseGpx('<gpx version="1.1"><trk><trkseg><trkpt lat="45.8" lon="6.8"/><trkpt lat="45.9" lon="6.9"/><trkpt lat="45.8" lon="6.8"/></trkseg></trk></gpx>', "loop.gpx", parser);
+  const { calls, provider } = recordingProvider();
+  const linked = await routeEditor.setRoundTrip(route, true, provider);
+  assert.equal(linked.waypoints.length, 2);
+  assert.deepEqual(linked.segments, route.segments);
+  assert.equal(calls.length, 0);
+  await assert.rejects(recalculate(linked, linked.waypoints.map((w, i) => i ? w : { ...w, lon: 6.81 }), provider), /point de passage/);
 });

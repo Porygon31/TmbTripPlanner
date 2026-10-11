@@ -78,7 +78,7 @@ export function composeTmb(catalog: Catalog, ids: string[]): Route {
     { name: "Trient", lat: 46.055, lon: 7.002 },
     { name: "Tré-le-Champ", lat: 46.003, lon: 6.92 },
   ];
-  const route = {
+  const route: Route = {
     ...newRoute(),
     mode: "tmb" as const,
     variantIds: selected.map((v) => v.id),
@@ -132,8 +132,10 @@ export function composeTmb(catalog: Catalog, ids: string[]): Route {
       start = cut;
     }
   }
-  if (route.waypoints.length)
+  if (route.waypoints.length) {
     route.waypoints.at(-1)!.name = "Les Houches · arrivée";
+    route.roundTrip = { arrivalId: route.waypoints.at(-1)!.id };
+  }
   return route;
 }
 export function splitSegment(

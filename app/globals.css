@@ -501,6 +501,28 @@ body {
   font-size: 10px;
   color: #8e9a8f;
 }
+.waypoint-role {
+  display: block;
+  color: #37665a;
+  font-size: 10px;
+  font-weight: 650;
+  margin-top: 3px;
+}
+.round-trip-option {
+  margin: 9px 0 12px;
+  padding: 12px;
+  border: 1px solid #dce5df;
+  border-radius: 8px;
+  background: #fafbf9;
+}
+.round-trip-option.is-active { background: #edf4ef; border-color: #b7d0bf; }
+.round-trip-option label { display: flex; align-items: center; gap: 9px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.round-trip-option label svg { margin-left: auto; color: #37665a; }
+.round-trip-option input { width: 17px; height: 17px; accent-color: #193f47; flex-shrink: 0; }
+.round-trip-option p { margin: 7px 0 0 26px; font-size: 11px; line-height: 1.55; color: #526a61; }
+.linked-arrival { background: #f5f8f3; padding: 12px 9px; border-radius: 7px; margin-top: 8px; }
+.linked-arrival .waypoint-name small { display: block; color: #617568; overflow-wrap: anywhere; }
+.waypoint-icon.round-trip-marker span { width: 34px; height: 34px; background: #b45125; font-weight: 700; }
 .coordinate-editor {
   display: grid;
   grid-template-columns: 1fr 1fr;

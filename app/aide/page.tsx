@@ -98,6 +98,10 @@ export default function HelpPage() {
             </div>
             <p>Les liaisons sont calculées sur les sentiers avec OpenRouteService. Commencez par des points proches, dans le massif du Mont-Blanc. Si un calcul échoue, un message l’indique et le dernier parcours valide est conservé.</p>
             <p><strong>Un point de passage</strong> est un repère que vous pouvez déplacer. Les nombreux <strong>points de trace</strong>, visibles dans les statistiques, décrivent tous les virages du chemin entre vos repères.</p>
+            <h3>Revenir au point de départ</h3>
+            <p>Dans <strong>Mon parcours</strong>, cochez <strong>Départ et arrivée</strong> sous le premier point. Le dernier passage est alors relié au départ par les sentiers. Cette option est déjà activée sur le TMB classique. Avec un seul point, le retour est calculé dès que vous ajoutez un passage.</p>
+            <p>Le repère <strong>D/A</strong> représente les deux extrémités : le déplacer met à jour le départ et l’arrivée ensemble. Les nouveaux points, lieux ou variantes ajoutés à un parcours libre se placent avant le retour. La distance, les étapes et le GPX incluent ce dernier tronçon.</p>
+            <p>Décocher l’option retire le dernier tronçon de retour. <strong>Annuler</strong> permet de le retrouver. Sur une trace importée ne comportant que le départ et l’arrivée, insérez d’abord un point de passage pour pouvoir déplacer le départ.</p>
             <p>Créer un nouveau parcours remplace le brouillon affiché. Pensez à <a href="#sauvegarde">sauvegarder ou exporter</a> le précédent si vous souhaitez le conserver.</p>
           </Chapter>
 

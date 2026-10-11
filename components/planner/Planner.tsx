@@ -48,6 +48,7 @@ import { useRouteEditor } from "@/hooks/use-route-editor";
 import { conflicts, composeTmb, integrateVariant, splitSegment } from "@/lib/tmb/catalog";
 import { downloadGpx, parseGpx } from "@/lib/tmb/gpx";
 import { km, meters, statistics, samePoint } from "@/lib/tmb/geo";
+import { routeStops } from "@/lib/tmb/loop";
 import type {
   Catalog,
   Route,
@@ -145,6 +146,7 @@ export default function Planner() {
   const tutorialUi = useRef<{ tab: string; mode: typeof mode; panel: typeof panel; base: string; visible: string[]; layers: string[]; poiExpanded: boolean; mobileProfile: boolean } | null>(null);
   const editor = useRouteEditor();
   const { route, busy, error, setError: reportError } = editor;
+  const stops = routeStops(route);
   const file = useRef<HTMLInputElement>(null);
   const mapWrap = useRef<HTMLDivElement>(null);
   const analysis = useAnalysis(route);
@@ -263,7 +265,7 @@ export default function Planner() {
     : tutorialId === "variant" ? route.variantIds.includes("9678267")
     : tutorialId === "insert" ? route.waypoints.length > tutorialBaseline
     : tutorialId === "move" ? tutorialEvents.includes("move")
-    : tutorialId === "stage" ? route.waypoints.some(w => w.stageEnd)
+    : tutorialId === "stage" ? stops.some(w => w.stageEnd)
     : tutorialId === "profile" ? hover !== null
     : tutorialId === "save" ? tutorialEvents.includes("save") : true;
   const toggleVisible = (id: string) =>
@@ -339,7 +341,7 @@ export default function Planner() {
     if (mode === "insert") editor.insert(p);
   };
   const addPoi = async (poi: PointOfInterest) => {
-    const last = routeRef.current.waypoints.at(-1);
+    const last = routeStops(routeRef.current).at(-1);
     if (busy || enriching || (last && samePoint(last, poi))) return;
     setTab("route");
     setMode("add");
@@ -414,6 +416,7 @@ export default function Planner() {
     state: () => ({
       name: route.name,
       mode: route.mode,
+      roundTrip: route.roundTrip ?? null,
       waypoints: route.waypoints,
       variantIds: route.variantIds,
       segments: route.segments.map((s) => ({
@@ -534,7 +537,7 @@ export default function Planner() {
                 <RouteIcon size={16} />
                 Mon parcours
                 {route.segments.length > 0 && (
-                  <span className="tab-count">{route.waypoints.length}</span>
+                  <span className="tab-count">{stops.length}</span>
                 )}
               </TabsTrigger>
             </TabsList>
@@ -787,7 +790,15 @@ export default function Planner() {
                   </details>
                 )}
                 <ol className="waypoints" data-tour="waypoints">
-                  {route.waypoints.map((w, i) => (
+                  {route.waypoints.map((w, i) => w.id === route.roundTrip?.arrivalId ? (
+                    <li key={w.id} className="waypoint-row linked-arrival">
+                      <span className="waypoint-number"><RotateCcw size={13} /></span>
+                      <div className="waypoint-name">
+                        <strong>Arrivée · retour au départ</strong>
+                        <small>{w.name} · liée au point 1</small>
+                      </div>
+                    </li>
+                  ) : (
                     <li key={w.id}>
                       <div className="waypoint-row">
                         <span className="waypoint-number">{i + 1}</span>
@@ -796,6 +807,7 @@ export default function Planner() {
                           onClick={() => selectWaypoint(w.id)}
                         >
                           <strong>{w.name}</strong>
+                          {i === 0 && <span className="waypoint-role">{route.roundTrip ? "Départ et arrivée" : "Départ"}</span>}
                           <small>
                             {w.lat.toFixed(4)}° N · {w.lon.toFixed(4)}° E
                           </small>
@@ -806,6 +818,7 @@ export default function Planner() {
                           className={w.stageEnd ? "stage-active" : ""}
                           aria-label={"Fin d’étape au point " + (i + 1)}
                           title="Fin d’étape"
+                          disabled={busy || enriching}
                           onClick={() =>
                             editor.replace({
                               ...route,
@@ -833,6 +846,30 @@ export default function Planner() {
                           <Trash2 size={14} />
                         </Button>
                       </div>
+                      {i === 0 && <div className={`round-trip-option ${route.roundTrip ? "is-active" : ""}`}>
+                        <label>
+                          <input
+                            type="checkbox"
+                            checked={!!route.roundTrip}
+                            disabled={busy || enriching}
+                            aria-describedby="round-trip-description"
+                            onChange={async (event) => {
+                              const enabled = event.target.checked;
+                              setNotice("");
+                              if (await editor.roundTrip(enabled)) setNotice(enabled
+                                ? "Le départ est aussi l’arrivée. Les points ajoutés se placent avant le retour."
+                                : "Le retour au départ a été retiré. Vous pouvez revenir en arrière avec Annuler.");
+                            }}
+                          />
+                          <span>Départ et arrivée</span>
+                          <RotateCcw size={15} aria-hidden="true" />
+                        </label>
+                        <p id="round-trip-description">{route.roundTrip
+                          ? stops.length < 2 && !route.segments.length
+                            ? "Ajoutez un point de passage : le retour ici sera calculé sur les sentiers."
+                            : "Le tour revient ici. Déplacer ce point déplace aussi l’arrivée. Décocher retire le dernier tronçon de retour."
+                          : "Cochez pour terminer le tour à ce premier point, avec un retour par les sentiers."}</p>
+                      </div>}
                       {selected === w.id && (
                         <div className="coordinate-editor">
                           <label className="waypoint-name-field">
@@ -871,7 +908,7 @@ export default function Planner() {
                               variant="outline"
                               size="sm"
                               disabled={
-                                busy || i === route.waypoints.length - 1
+                                busy || i === stops.length - 1
                               }
                               aria-label="Descendre le point"
                               onClick={() => reorder(i, 1)}

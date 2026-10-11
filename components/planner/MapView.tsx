@@ -14,6 +14,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { POI_CATEGORIES, PoiSymbol } from "./poi-categories";
 import { Plus, Check, LoaderCircle } from "lucide-react";
 import { samePoint } from "@/lib/tmb/geo";
+import { routeStops } from "@/lib/tmb/loop";
 import { useEffect, useMemo, useState, useRef } from "react";
 import type { Catalog, MapProvider, Route, RoutePoint, PointOfInterest } from "@/lib/tmb/types";
 export const providers: MapProvider[] = [
@@ -141,7 +142,8 @@ export default function MapView({
 }) {
   const provider = providers.find((p) => p.id === base) ?? providers[0];
   const [pois, setPois] = useState<PointOfInterest[]>([]);
-  const lastWaypoint = route?.waypoints.at(-1);
+  const stops = route ? routeStops(route) : [];
+  const lastWaypoint = stops.at(-1);
   useEffect(() => {
     fetch("/data/pois.json")
       .then((r) => r.json())
@@ -250,16 +252,19 @@ export default function MapView({
             </Popup>
           </Marker>;
         })}
-      {route?.waypoints.map((w, i) => (
+      {stops.map((w, i) => (
         <Marker
           key={`${w.id}-${w.lat}-${w.lon}`}
           position={[w.lat, w.lon]}
           draggable={editing}
+          zIndexOffset={i === 0 && route?.roundTrip ? 1000 : 0}
+          title={`${i === 0 ? route?.roundTrip ? "Départ et arrivée" : "Départ" : `Point ${i + 1}`} · ${w.name}`}
+          alt={`${i === 0 && route?.roundTrip ? "Départ et arrivée" : `Point ${i + 1}`} · ${w.name}`}
           icon={L.divIcon({
-            className: "waypoint-icon",
-            html: `<span>${i + 1}</span>`,
-            iconSize: [26, 26],
-            iconAnchor: [13, 13],
+            className: `waypoint-icon${i === 0 && route?.roundTrip ? " round-trip-marker" : ""}`,
+            html: `<span>${i === 0 && route?.roundTrip ? "D/A" : i + 1}</span>`,
+            iconSize: i === 0 && route?.roundTrip ? [34, 34] : [26, 26],
+            iconAnchor: i === 0 && route?.roundTrip ? [17, 17] : [13, 13],
           })}
           eventHandlers={{
             dragend: (e) => {
@@ -269,7 +274,10 @@ export default function MapView({
             },
           }}
         >
-          <Popup>{w.name}</Popup>
+          <Popup>
+            <strong>{w.name}</strong>
+            {i === 0 && route?.roundTrip && <p>Départ et arrivée du tour. Déplacez ce repère pour modifier les deux ensemble.</p>}
+          </Popup>
         </Marker>
       ))}
       {hover && (

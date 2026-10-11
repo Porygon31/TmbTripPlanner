@@ -1,15 +1,15 @@
 "use client";
 import { useCallback, useRef, useState } from "react";
-import { EditCoordinator, recalculate, routedSource } from "@/lib/tmb/editor";
+import { appendVariant, EditCoordinator, recalculate, setRoundTrip } from "@/lib/tmb/editor";
+import { linkedWaypoints, routeStops } from "@/lib/tmb/loop";
 import {
   composeTmb,
   integrateVariant,
   newRoute,
   removeVariant,
   splitSegment,
-  variantPieces,
 } from "@/lib/tmb/catalog";
-import { distance, nearestIndex, uid } from "@/lib/tmb/geo";
+import { nearestIndex, uid } from "@/lib/tmb/geo";
 import { routingProvider } from "@/lib/tmb/routing";
 import type {
   Catalog,
@@ -29,6 +29,7 @@ export function useRouteEditor() {
   const actionVersion = useRef(0);
   const practiceBackup = useRef<{ route: Route; history: Route[]; future: Route[] } | null>(null);
   const commit = useCallback((next: Route, record = true) => {
+    if (next.roundTrip) next = { ...next, waypoints: linkedWaypoints(next, next.waypoints) };
     const previous = current.current;
     if (record) {
       setHistory((h) => [...h.slice(-24), previous]);
@@ -89,12 +90,13 @@ export function useRouteEditor() {
   const add = useCallback(
     (p: RoutePoint, name?: string) => {
       const r = current.current;
-      const w = { ...p, id: uid(), name: name?.trim().slice(0, 120) || `Point ${r.waypoints.length + 1}` };
+      const stops = routeStops(r);
+      const w = { ...p, id: uid(), name: name?.trim().slice(0, 120) || `Point ${stops.length + 1}` };
       if (!r.waypoints.length) {
         replace({ ...r, waypoints: [w] });
         return true;
       }
-      return change([...r.waypoints, w]);
+      return change([...stops, w]);
     },
     [change, replace],
   );
@@ -143,55 +145,7 @@ export function useRouteEditor() {
         }
         return;
       }
-      return perform(async (signal) => {
-        let points = v.points;
-        const last = r.waypoints.at(-1);
-        if (last && distance(last, points.at(-1)!) < distance(last, points[0]))
-          points = [...points].reverse();
-        const entry = { ...points[0], id: uid(), name: `${v.name} · entrée` };
-        const segments = [...r.segments],
-          waypoints = [...r.waypoints];
-        let from = last;
-        if (last && distance(last, entry) > 0.5) {
-          const connector = await routingProvider.route(last, entry, signal);
-          segments.push({
-            id: uid(),
-            points: connector,
-            from: last.id,
-            to: entry.id,
-            source: routedSource,
-          });
-          waypoints.push(entry);
-          from = entry;
-        } else if (!last) {
-          waypoints.push(entry);
-          from = entry;
-        }
-        for (const piece of variantPieces(v, points[0])) {
-          const exit = {
-            ...piece.points.at(-1)!,
-            id: uid(),
-            name: `${v.name} · ${piece.source.kind === "routing" ? "raccord" : "sortie"}`,
-          };
-          segments.push({
-            id: uid(),
-            points: piece.points,
-            from: from!.id,
-            to: exit.id,
-            source: piece.source,
-            variantId: v.id,
-          });
-          waypoints.push(exit);
-          from = exit;
-        }
-        return {
-          ...r,
-          segments,
-          waypoints,
-          variantIds: [...r.variantIds, v.id],
-          updatedAt: new Date().toISOString(),
-        };
-      });
+      return perform(signal => appendVariant(r, v, routingProvider, signal));
     },
     [perform, replace],
   );
@@ -223,6 +177,7 @@ export function useRouteEditor() {
     add,
     insert,
     change,
+    roundTrip: (enabled: boolean) => perform(signal => setRoundTrip(current.current, enabled, routingProvider, signal)),
     variant,
     undo,
     redo,

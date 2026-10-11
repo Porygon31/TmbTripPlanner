@@ -1,5 +1,6 @@
 import { get, set } from "idb-keyval";
 import type { Route } from "./types";
+import { samePoint } from "./geo";
 type Envelope = { version: 1; route: Route; savedAt: string };
 const key = (kind: "draft" | "saved") => `tmb-atelier:v1:${kind}`;
 export function validateStoredRoute(value: unknown): Route | null {
@@ -13,6 +14,13 @@ export function validateStoredRoute(value: unknown): Route | null {
   )
     return null;
   const r = record.route;
+  if (r.roundTrip !== undefined) {
+    if (!r.roundTrip || typeof r.roundTrip.arrivalId !== "string" || !r.roundTrip.arrivalId) return null;
+    const first = r.waypoints[0], last = r.waypoints.at(-1);
+    if (r.waypoints.length > 1 && (!first || !last || last.id !== r.roundTrip.arrivalId || first.id === last.id || !samePoint(first, last))) return null;
+    if (r.waypoints.slice(0, -1).some(w => w.id === r.roundTrip!.arrivalId)) return null;
+    if (r.waypoints.length === 1 && first.id === r.roundTrip.arrivalId) return null;
+  }
   if (
     typeof r.id !== "string" ||
     typeof r.name !== "string" ||
