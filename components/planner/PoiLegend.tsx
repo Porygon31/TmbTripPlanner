@@ -19,9 +19,9 @@ export default function PoiLegend({ layers, onChange, expanded, onToggle }: {
       <div id="poi-legend-layers" hidden={!expanded}>
         <div className="poi-legend-items">
           {POI_CATEGORIES.map(category => (
-            <label key={category.id} className="poi-legend-item">
+            <label key={category.id} className={`poi-legend-item${category.id === "start" ? " poi-legend-start" : ""}`}>
               <PoiSymbol category={category} />
-              <span>{category.label}</span>
+              <span>{category.label}{category.id === "start" && <small>Départ du TMB</small>}</span>
               <Checkbox checked={layers.includes(category.id)} onCheckedChange={checked => onChange(category.id, checked === true)} />
             </label>
           ))}

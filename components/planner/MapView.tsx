@@ -4,6 +4,7 @@ import {
   TileLayer,
   Polyline,
   useMapEvents,
+  useMap,
   Marker,
   Popup,
   Tooltip,
@@ -11,7 +12,7 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import { renderToStaticMarkup } from "react-dom/server";
-import { POI_CATEGORIES, PoiSymbol } from "./poi-categories";
+import { POI_CATEGORIES, PoiSymbol, TMB_START_POI_ID } from "./poi-categories";
 import { Plus, Check, LoaderCircle } from "lucide-react";
 import { samePoint } from "@/lib/tmb/geo";
 import { routeStops } from "@/lib/tmb/loop";
@@ -40,10 +41,21 @@ const coords = (points: RoutePoint[]) =>
 const poiIcons = Object.fromEntries(POI_CATEGORIES.map(category => [category.id, L.divIcon({
   className: `poi-map-icon poi-map-icon-${category.id}`,
   html: renderToStaticMarkup(<PoiSymbol category={category} />),
-  iconSize: [26, 26],
-  iconAnchor: [13, 13],
-  popupAnchor: [0, -15],
+  iconSize: category.id === "start" ? [46, 58] : [26, 26],
+  iconAnchor: category.id === "start" ? [23, 58] : [13, 13],
+  popupAnchor: category.id === "start" ? [0, -55] : [0, -15],
 })]));
+function HouchesLabel({ name }: { name: string }) {
+  const map = useMap();
+  const [compact, setCompact] = useState(() => map.getSize().x <= 700);
+  useMapEvents({ resize: () => setCompact(map.getSize().x <= 700) });
+  return (
+    <Tooltip key={compact ? "bottom" : "left"} direction={compact ? "bottom" : "left"}
+      offset={compact ? [0, 16] : [-30, -20]} permanent opacity={1} className="tmb-start-label">
+      <strong>{name}</strong><span>Départ du TMB classique</span>
+    </Tooltip>
+  );
+}
 function Events({
   onPoint,
   fit,
@@ -211,22 +223,24 @@ export default function MapView({
         />
       ))}
       {pois
-        .filter((p) => layers.includes(p.type))
+        .filter((p) => layers.includes(p.id === TMB_START_POI_ID ? "start" : p.type))
         .map((p) => {
-          const category = POI_CATEGORIES.find(c => c.id === p.type);
+          const isStart = p.id === TMB_START_POI_ID;
+          const category = POI_CATEGORIES.find(c => c.id === (isStart ? "start" : p.type));
           if (!category) return null;
           const alreadyLast = !!lastWaypoint && samePoint(lastWaypoint, p);
           return <Marker
             key={p.id}
             position={[p.lat, p.lon]}
-            icon={poiIcons[p.type]}
+            icon={poiIcons[category.id]}
             title={`${category.singular} · ${p.name}`}
             alt={`${category.singular} · ${p.name}`}
-            zIndexOffset={-100}
+            zIndexOffset={isStart ? 500 : -100}
             bubblingMouseEvents={false}
             eventHandlers={{ click: () => onPoiOpen?.() }}
           >
-            <Tooltip direction="top" offset={[0, -13]}>{p.name}</Tooltip>
+            {isStart ? <HouchesLabel name={p.name} /> :
+              <Tooltip direction="top" offset={[0, -13]}>{p.name}</Tooltip>}
             <Popup className="poi-popup" minWidth={230} maxWidth={280} autoPanPaddingTopLeft={[16, 112]} autoPanPaddingBottomRight={[16, 90]}>
               <strong>{p.name}</strong>
               <p>

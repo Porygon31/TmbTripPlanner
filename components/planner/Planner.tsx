@@ -152,7 +152,7 @@ export default function Planner() {
   const analysis = useAnalysis(route);
   const stat = analysis.stats;
   const storage = useProjectStorage(route, editor.replace, setNotice, tutorialActive);
-  const [layers, setLayers] = useState<string[]>([]),
+  const [layers, setLayers] = useState<string[]>(["start"]),
     [poiExpanded, setPoiExpanded] = useState(true),
     [mobileProfile, setMobileProfile] = useState(false),
     [enriching, setEnriching] = useState(false);
@@ -213,8 +213,8 @@ export default function Planner() {
     setSelected(null);
     setNotice("");
     reportError("");
-    if (step.id === "poi") setLayers(["refuge"]);
-    else setLayers([]);
+    if (step.id === "poi") setLayers(["start", "refuge"]);
+    else setLayers(["start"]);
     if (["preview", "variant", "insert", "move"].includes(step.id)) setTutorialFocus(tricot.points);
     else if (step.id === "poi") setTutorialFocus([{ lat: 45.892, lon: 6.81 }, { lat: 45.855, lon: 6.755 }]);
     else if (index <= 3) setTutorialFocus([{ lat: 45.894, lon: 6.807 }, { lat: 45.880, lon: 6.777 }]);

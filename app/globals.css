@@ -258,6 +258,38 @@ body {
 .poi-symbol svg { width: 15px; height: 15px; }
 .poi-map-icon { background: transparent; border: 0; }
 .poi-map-icon:focus-visible .poi-symbol { outline: 3px solid #193f47; outline-offset: 2px; }
+.poi-map-icon-start .poi-symbol {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  border-width: 3px;
+  border-radius: 14px;
+  box-shadow: 0 3px 10px #77371550, 0 0 0 3px #fff8;
+}
+.poi-map-icon-start .poi-symbol::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: #b45125;
+  border-bottom: 0;
+}
+.poi-map-icon-start .poi-symbol svg { width: 26px; height: 26px; }
+.leaflet-tooltip.tmb-start-label {
+  padding: 8px 13px;
+  border: 1px solid #d5ad94;
+  border-radius: 9px;
+  background: #fffcf8;
+  color: #193f47;
+  text-align: center;
+  box-shadow: 0 3px 12px #48302524;
+}
+.tmb-start-label strong { display: block; font-size: 18px; line-height: 1.2; font-weight: 800; }
+.tmb-start-label span { display: block; margin-top: 3px; font-size: 10px; font-weight: 600; color: #99502c; }
+.poi-legend-start { margin-bottom: 4px; color: #904321; background: #fff3e9; font-weight: 700; }
+.poi-legend-start small { display: block; margin-top: 2px; font-size: 10px; font-weight: 500; }
 .poi-popup .leaflet-popup-content { font-size: 14px; line-height: 1.5; }
 .poi-popup .leaflet-popup-content p { margin: 7px 0; }
 .poi-popup .leaflet-popup-content > a { font-size: 12px; }
