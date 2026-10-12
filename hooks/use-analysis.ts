@@ -12,6 +12,7 @@ import type {
 export type Analysis = {
   engine?: 'worker'|'fallback';
   stats: RouteStatistics;
+  segmentStats: Record<string, RouteStatistics>;
   profile: ElevationPoint[];
   display: Record<string, RoutePoint[]>;
   days: { name: string; stats: RouteStatistics }[];
@@ -19,6 +20,7 @@ export type Analysis = {
 export function useAnalysis(route: Route) {
   const [result, setResult] = useState<Analysis & { forRoute?: Route }>({
     stats: statistics([]),
+    segmentStats: {},
     profile: [],
     display: {},
     days: [],
@@ -42,6 +44,7 @@ export function useAnalysis(route: Route) {
       setResult({
         forRoute: route,
         stats: statistics(route.segments),
+        segmentStats: Object.fromEntries(route.segments.map(s => [s.id, statistics([s])])),
         profile: profile(route.segments),
         display: {},
         days: dailyStatistics(route),

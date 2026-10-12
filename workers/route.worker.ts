@@ -13,6 +13,7 @@ self.onmessage = (e) => {
   const { id, route } = e.data;
   try {
     const display: Record<string, RoutePoint[]> = {};
+    const segmentStats: Record<string, ReturnType<typeof statistics>> = {};
     for (const s of route.segments) {
       let result = cache.get(s.id);
       if (!result) {
@@ -27,6 +28,7 @@ self.onmessage = (e) => {
         cache.set(s.id, result);
       }
       display[s.id] = result.display;
+      segmentStats[s.id] = result.stats;
     }
     if (cache.size > 200) {
       const keep = new Set(route.segments.map((s) => s.id));
@@ -49,6 +51,7 @@ self.onmessage = (e) => {
     self.postMessage({
       id,
       stats: statistics(route.segments),
+      segmentStats,
       profile: profile(route.segments),
       display,
       days,

@@ -84,7 +84,7 @@ export default function HelpPage() {
             <ul>
               <li><strong>Se déplacer :</strong> faites glisser la carte avec la souris ou le doigt.</li>
               <li><strong>Zoomer :</strong> utilisez + / −, la molette ou deux doigts sur téléphone.</li>
-              <li><strong>Changer de fond :</strong> choisissez Relief pour la carte topographique, ou Classique pour le fond OpenStreetMap.</li>
+              <li><strong>Changer de fond :</strong> le fond Classique (OpenStreetMap) est affiché par défaut. Choisissez Relief pour la carte topographique.</li>
               <li><strong>Se situer :</strong> le bouton cible demande votre position, avec l’autorisation du navigateur. Le carré ouvre le plein écran lorsque le navigateur le permet.</li>
               <li><strong>Explorer ou tracer :</strong> Explorer sert à consulter la carte ; Tracer permet d’ajouter des points au parcours.</li>
             </ul>
@@ -158,6 +158,9 @@ export default function HelpPage() {
 
           <Chapter index={7}>
             <p>Les statistiques affichent la distance, les dénivelés positif et négatif (D+ et D−), les altitudes extrêmes et le nombre de points de trace. Elles évoluent avec votre parcours.</p>
+            <h3>Comparer deux points de passage</h3>
+            <p>Dans <strong>Mon parcours</strong>, cliquez sur <strong>Entre deux points</strong> au-dessus des chiffres, puis choisissez le point de début et le point de fin. Le bilan et la marche indicative portent sur tous les tronçons entre ces deux repères, dans le sens du parcours. Pour une boucle, <strong>Arrivée · retour au départ</strong> permet d’inclure le dernier tronçon.</p>
+            <p><strong>Parcours entier</strong> réaffiche le bilan global. La sélection ne modifie pas le tracé ; le profil altimétrique et le fichier GPX présentent toujours le parcours entier. Une rupture de GPX reste signalée et aucune distance fictive n’est ajoutée entre les parties séparées.</p>
             <ul>
               <li>Sur ordinateur, le profil se trouve sous la carte. Sur téléphone, ouvrez-le avec le bouton <strong>Profil d’altitude</strong>.</li>
               <li>Survolez ou touchez le profil : un marqueur indique le même endroit sur la carte. Survoler le tracé permet aussi de retrouver son altitude dans le profil.</li>

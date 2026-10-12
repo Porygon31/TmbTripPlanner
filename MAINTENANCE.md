@@ -40,7 +40,7 @@ Les six GPX originaux ont été téléchargés depuis le panneau **Download rout
 - `*-connector-*.json` : liaisons réellement calculées par ORS, conservées comme segments de provenance distincte.
 - `catalog.json` : boucle orientée dans le sens antihoraire depuis Les Houches, variantes, statistiques, métadonnées, SHA-256 des GPX.
 - `catalog-audit.json` : continuité, raccordements, orientation, couverture des cotations SAC et liaisons.
-- `pois.json` : 128 POI OSM nommés ; extrait non exhaustif autour du tracé et des variantes. Les petites zones d’extraction sont documentées par `scripts/fetch-pois-osm.ts`.
+- `pois.json` : 160 POI OSM nommés, dont 32 hôtels (`tourism=hotel`) ; extrait non exhaustif autour du tracé et des variantes. Les petites zones d’extraction sont documentées par `scripts/fetch-pois-osm.ts`. `extractedAt` garde la date du plus ancien extrait utilisé et `preparedAt` la date de préparation du fichier. La catégorie Hôtels est désactivée au premier affichage, comme les autres catégories hors Les Houches.
 
 Pour actualiser, conserver une copie datée des sources ; télécharger à nouveau les six GPX avec les noms attendus ; retirer uniquement les fichiers dérivés correspondants (`*-ways.json`, `*-metadata.json`, `*-elevation.json`, `*-connector-*.json`) avant de lancer les scripts suivants. Ne pas utiliser une ancienne altitude pour de nouvelles coordonnées.
 
@@ -63,6 +63,7 @@ Les distances utilisent une géodésie sphérique Turf. D+/D− : rééchantillo
 - `lib/tmb` : types, géométrie, composition du catalogue, GPX, éditeur, routage, stockage, étapes et interface future des conditions de sentier.
 - `hooks` : transactions d’édition avec AbortController et révision, historique, autosauvegarde, WebMCP.
 - `workers` : analyse/simplification avec cache par identifiant de segment ; import XML hors du fil d’interface. Repli fonctionnel si le navigateur ne peut charger un Worker.
+- `lib/tmb/sections.ts` : sélection des tronçons par identifiants de bornes (départ et arrivée distincts même aux mêmes coordonnées) et agrégation des statistiques mémorisées. La sélection dans le panneau est locale à l’affichage ; elle ne change ni le parcours ni le GPX. Une borne supprimée ou réordonnée hors de l’intervalle réaffiche le bilan global avec un message.
 - `app/api/route` et `app/api/elevation` : proxy ORS avec validation, limite du corps à 160 ko, contrôle d’origine et gestion des erreurs. Pas de clé dans le client.
 
 Les géométries complètes servent toujours à l’export. Le Worker ne simplifie que les lignes affichées. Chaque tronçon conserve ses bornes, sa provenance et ses coordonnées ; déplacer un point transforme les tronçons adjacents en segments personnalisés. Un point inséré sur un tronçon conserve sa géométrie. Une variante dont les raccordements ont été déplacés doit être rétablie avant de pouvoir être remplacée automatiquement.

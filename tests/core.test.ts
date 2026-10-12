@@ -15,6 +15,7 @@ import { EditCoordinator, recalculate } from "../lib/tmb/editor";
 import * as routeEditor from "../lib/tmb/editor";
 import {dailyStatistics}from'../lib/tmb/stages';
 import {validateStoredRoute}from'../lib/tmb/storage';
+import { selectRouteSection, combineSegmentStatistics } from "../lib/tmb/sections";
 import type { Catalog, RoutePoint, RoutingProvider } from "../lib/tmb/types";
 const parser = DOMParser as unknown as typeof globalThis.DOMParser;
 const catalog = JSON.parse(
@@ -47,6 +48,57 @@ const makeRoute = () => {
     }));
   return r;
 };
+test("section statistics follow the selected waypoints, including intermediate segments", () => {
+  const route = makeRoute();
+  route.segments.forEach((s, i) => { s.points = s.points.map((p, j) => ({ ...p, ele: 100 * i + 20 * j })); });
+  const section = selectRouteSection(route, "1", "3");
+  assert.deepEqual(section?.map(s => s.id), ["s1", "s2"]);
+  const bySegment = Object.fromEntries(route.segments.map(s => [s.id, statistics([s])]));
+  const actual = combineSegmentStatistics(section!, bySegment)!;
+  const expected = statistics(route.segments.slice(1, 3));
+  assert.deepEqual(actual, expected);
+  assert.ok(actual.distance < statistics(route.segments).distance);
+  assert.equal(actual.minElevation, 100);
+  assert.equal(actual.maxElevation, 220);
+  assert.equal(actual.hours, actual.distance / 4000 + actual.ascent / 600);
+});
+test("invalid or deleted section bounds never fall back to unrelated segments", () => {
+  const route = makeRoute();
+  for (const [from, to] of [["2", "1"], ["1", "1"], ["deleted", "2"], ["0", "missing"]]) {
+    assert.equal(selectRouteSection(route, from, to), null);
+  }
+  const section = selectRouteSection(route, "0", "2")!;
+  assert.equal(combineSegmentStatistics(section, { s0: statistics([route.segments[0]]) }), null);
+});
+test("section selection distinguishes a tour's arrival from its identical departure coordinates", () => {
+  const route = composeTmb(catalog, []);
+  const start = route.waypoints[0], arrival = route.waypoints.at(-1)!;
+  assert.ok(distance(start, arrival) < 0.5);
+  assert.deepEqual(selectRouteSection(route, start.id, arrival.id)?.map(s => s.id), route.segments.map(s => s.id));
+  assert.deepEqual(selectRouteSection(route, route.waypoints.at(-2)!.id, arrival.id)?.map(s => s.id), [route.segments.at(-1)!.id]);
+});
+test("partial and missing elevations stay explicit in selected sections", () => {
+  const route = makeRoute();
+  route.segments[0].points[0].ele = 0;
+  const bySegment = Object.fromEntries(route.segments.map(s => [s.id, statistics([s])]));
+  const partial = combineSegmentStatistics(selectRouteSection(route, "0", "2")!, bySegment)!;
+  assert.deepEqual(partial, statistics(route.segments.slice(0, 2)));
+  assert.equal(partial.elevationCoverage, 0.25);
+  assert.equal(partial.minElevation, 0);
+  const missing = combineSegmentStatistics(selectRouteSection(route, "1", "2")!, bySegment)!;
+  assert.equal(missing.elevationCoverage, 0);
+  assert.equal(missing.minElevation, null);
+});
+test("sections across GPX breaks exclude unrecorded connectors and outside breaks", () => {
+  const route = parseGpx('<gpx version="1.1"><trk><trkseg><trkpt lat="45.8" lon="6.8"/><trkpt lat="45.81" lon="6.8"/></trkseg><trkseg><trkpt lat="45.9" lon="6.8"/><trkpt lat="45.91" lon="6.8"/></trkseg></trk></gpx>', "gap.gpx", parser);
+  const [a, b, c, d] = route.waypoints;
+  assert.equal(selectRouteSection(route, b.id, c.id), null);
+  const bySegment = Object.fromEntries(route.segments.map(s => [s.id, statistics([s])]));
+  const all = combineSegmentStatistics(selectRouteSection(route, a.id, d.id)!, bySegment)!;
+  assert.ok(Math.abs(all.distance - 2223.9) < 2);
+  assert.equal(all.gaps, 1);
+  assert.equal(combineSegmentStatistics(selectRouteSection(route, c.id, d.id)!, bySegment)!.gaps, 0);
+});
 test("geodesic distances and gaps exclude synthetic joins", () => {
   const s = statistics([
     { points: [p(45.8), p(45.81)] },

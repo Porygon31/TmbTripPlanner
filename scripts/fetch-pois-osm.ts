@@ -17,6 +17,7 @@ catalog.variants.forEach((v) =>
   centers.push(v.points[Math.floor(v.points.length / 2)]),
 );
 const all = new Map();
+const excerptDates: number[] = [];
 await fs.mkdir("work/poi-cache", { recursive: true });
 for (let i = 0; i < centers.length; i++) {
   const p = centers[i],
@@ -42,6 +43,7 @@ for (let i = 0; i < centers.length; i++) {
     data = await r.json();
     await fs.writeFile(cache, JSON.stringify(data));
   }
+  excerptDates.push((await fs.stat(cache)).mtimeMs);
   const nodes = new Map<number, { lat: number; lon: number }>(
     data.elements
       .filter((e: { type: string }) => e.type === "node")
@@ -53,15 +55,17 @@ for (let i = 0; i < centers.length; i++) {
     const type =
       t.tourism === "alpine_hut"
         ? "refuge"
-        : t.natural === "saddle"
-          ? "col"
-          : t.natural === "peak"
-            ? "sommet"
-            : ["village", "hamlet"].includes(t.place)
-              ? "village"
-              : t.tourism === "viewpoint"
-                ? "poi"
-                : null;
+        : t.tourism === "hotel"
+          ? "hotel"
+          : t.natural === "saddle"
+            ? "col"
+            : t.natural === "peak"
+              ? "sommet"
+              : ["village", "hamlet"].includes(t.place)
+                ? "village"
+                : t.tourism === "viewpoint"
+                  ? "poi"
+                  : null;
     if (!type) continue;
     let lat = e.lat,
       lon = e.lon;
@@ -92,7 +96,8 @@ for (let i = 0; i < centers.length; i++) {
 await fs.writeFile(
   "public/data/pois.json",
   JSON.stringify({
-    extractedAt: new Date().toISOString(),
+    extractedAt: new Date(Math.min(...excerptDates)).toISOString(),
+    preparedAt: new Date().toISOString(),
     source: "OpenStreetMap API 0.6 / extraits autour du tracé",
     license: "© OpenStreetMap contributors · ODbL 1.0",
     coverage:

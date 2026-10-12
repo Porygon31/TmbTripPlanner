@@ -140,7 +140,7 @@ export default function MapView({
   catalog,
   visible,
   route,
-  base = "topo",
+  base = "osm",
   onPoint = () => {},
   onAddPoi,
   onPoiOpen,
@@ -175,7 +175,7 @@ export default function MapView({
   display?: Record<string, RoutePoint[]>;
   layers?: string[];
 }) {
-  const provider = providers.find((p) => p.id === base) ?? providers[0];
+  const provider = providers.find((p) => p.id === base) ?? providers.find(p => p.id === "osm")!;
   const [pois, setPois] = useState<PointOfInterest[]>([]);
   const stops = route ? routeStops(route) : [];
   const lastWaypoint = stops.at(-1);

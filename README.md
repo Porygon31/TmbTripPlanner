@@ -1,6 +1,6 @@
 # TMB Atelier
 
-Préparer son Tour du Mont-Blanc : carte topographique, cinq variantes OSM, parcours pédestres OpenRouteService, points déplaçables, profil altimétrique, GPX, sauvegardes locales et étapes.
+Préparer son Tour du Mont-Blanc : fond Classique par défaut et Relief au choix, cinq variantes OSM, parcours pédestres OpenRouteService, points déplaçables, hôtels et refuges, statistiques entre points, profil altimétrique, GPX, sauvegardes locales et étapes.
 
 **Guide de configuration, sources, tests et maintenance : [MAINTENANCE.md](./MAINTENANCE.md).**
 
@@ -13,6 +13,8 @@ Préparer son Tour du Mont-Blanc : carte topographique, cinq variantes OSM, parc
 5. Le brouillon se sauvegarde automatiquement sur l’appareil. **Sauvegarder** conserve une version explicite ; **Restaurer le dernier parcours** la recharge. **Annuler / Rétablir** permet de revenir sur les modifications de la session.
 
 Sur mobile, agrandir ou réduire le panneau avec sa poignée. Le bouton **Profil d’altitude** ouvre le profil au-dessus du panneau réduit. Toucher le profil positionne le repère correspondant sur la carte.
+
+Dans **Mon parcours**, **Entre deux points** permet de choisir les bornes d’une portion pour afficher sa distance, ses D+/D−, ses altitudes et sa durée indicative. **Parcours entier** rappelle le bilan global. La borne **Arrivée · retour au départ** inclut le dernier tronçon d’une boucle. Le profil et l’export GPX conservent le parcours entier.
 
 Le bouton **Tutoriel** dans la barre du haut ouvre un guide interactif de 15 chapitres : carte, parcours libre, lieux, classique, variantes, insertion et déplacement, étapes, profil, sauvegarde et GPX. Les commandes agissent sur un parcours d’essai isolé ; quitter ou terminer restitue le parcours et son historique. Pendant l’essai, la sauvegarde est simulée et le brouillon personnel reste protégé, y compris au rechargement. Les chapitres peuvent être choisis directement ou passés.
 

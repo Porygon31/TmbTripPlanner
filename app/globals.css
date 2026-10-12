@@ -463,6 +463,19 @@ body {
   column-gap: 8px;
   padding: 21px 0;
 }
+.route-statistics { margin-top: 16px; }
+.stats-scope { display: flex; padding: 3px; border: 1px solid #dce5dd; border-radius: 8px; background: #f3f6f2; }
+.stats-scope button { flex: 1; min-height: 35px; padding: 6px 4px; border-radius: 5px; font-size: 12px; line-height: 1.3; color: #586e70; }
+.stats-scope button[aria-pressed="true"] { background: #193f47; color: white; font-weight: 600; }
+.stats-scope button:disabled { opacity: .5; cursor: not-allowed; }
+.stats-range { display: grid; gap: 9px; padding-top: 12px; }
+.stats-range label { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: center; gap: 7px; font-size: 12px; font-weight: 600; }
+.stats-range select { min-width: 0; width: 100%; min-height: 36px; padding: 7px; border: 1px solid #dce5dd; border-radius: 6px; background: white; color: #193f47; font-size: 12px; }
+.stats-range p, .stats-note { font-size: 11px; line-height: 1.5; color: #667d7b; }
+.stats-note { margin: 10px 0; }
+.stats-walking { display: grid; grid-template-columns: 1fr auto; gap: 5px 10px; padding: 10px 0; border-top: 1px solid #e5ebe3; font-size: 12px; }
+.stats-walking strong { font-weight: 700; }
+.stats-walking small { grid-column: 1 / -1; font-size: 10px; color: #667d7b; }
 .stats-grid > div {
   display: flex;
   flex-direction: column;

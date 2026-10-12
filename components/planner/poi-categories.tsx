@@ -1,10 +1,11 @@
-import { House, Signpost, Mountain, Building2, Binoculars, Flag } from "lucide-react";
+import { House, Signpost, Mountain, Building2, Binoculars, Flag, BedDouble } from "lucide-react";
 
 export const TMB_START_POI_ID = "node/1744277791";
 
 export const POI_CATEGORIES = [
   { id: "start", label: "Les Houches", singular: "Départ du TMB classique", color: "#b45125", Icon: Flag },
   { id: "refuge", label: "Refuges", singular: "Refuge", color: "#a04b22", Icon: House },
+  { id: "hotel", label: "Hôtels", singular: "Hôtel", color: "#a87808", Icon: BedDouble },
   { id: "col", label: "Cols", singular: "Col", color: "#087b78", Icon: Signpost },
   { id: "sommet", label: "Sommets", singular: "Sommet", color: "#7750a4", Icon: Mountain },
   { id: "village", label: "Villages", singular: "Village", color: "#2668b3", Icon: Building2 },

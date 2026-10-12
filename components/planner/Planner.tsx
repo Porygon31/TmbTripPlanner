@@ -54,7 +54,6 @@ import type {
   Route,
   RoutePoint,
   TmbVariant,
-  RouteStatistics,
   Provenance,
   PointOfInterest,
 } from "@/lib/tmb/types";
@@ -67,6 +66,7 @@ import { uid } from "@/lib/tmb/geo";
 import PoiLegend from "./PoiLegend";
 import Tutorial, { TUTORIAL_STEPS } from "./Tutorial";
 import WelcomeDialog from "./WelcomeDialog";
+import RouteStatisticsPanel, { Stats } from "./RouteStatistics";
 import GpxWorker from "@/workers/gpx.worker?worker";
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
@@ -75,55 +75,10 @@ const MapView = dynamic(() => import("./MapView"), {
   ),
 });
 export const SECONDARY = true;
-function Stats({ value }: { value: RouteStatistics }) {
-  return (
-    <div className="stats-grid">
-      <div>
-        <strong>
-          {km(value.distance)}
-          <small> km</small>
-        </strong>
-        <span>Distance</span>
-      </div>
-      <div>
-        <strong>
-          {value.elevationCoverage ? meters(value.ascent) : "—"}
-          <small> m</small>
-        </strong>
-        <span>Dénivelé +</span>
-      </div>
-      <div>
-        <strong>
-          {value.elevationCoverage ? meters(value.descent) : "—"}
-          <small> m</small>
-        </strong>
-        <span>Dénivelé −</span>
-      </div>
-      <div>
-        <strong>
-          {value.minElevation === null ? "—" : meters(value.minElevation)}
-          <small> m</small>
-        </strong>
-        <span>Altitude min.</span>
-      </div>
-      <div>
-        <strong>
-          {value.maxElevation === null ? "—" : meters(value.maxElevation)}
-          <small> m</small>
-        </strong>
-        <span>Altitude max.</span>
-      </div>
-      <div>
-        <strong>{meters(value.pointCount)}</strong>
-        <span>Points de trace</span>
-      </div>
-    </div>
-  );
-}
 export default function Planner() {
   const [catalog, setCatalog] = useState<Catalog | null>(null),
     [visible, setVisible] = useState<string[]>([]),
-    [base, setBase] = useState("topo"),
+    [base, setBase] = useState("osm"),
     [tab, setTab] = useState("explore"),
     [mode, setMode] = useState<"view" | "add" | "insert">("view"),
     [fit, setFit] = useState(0),
@@ -673,26 +628,7 @@ export default function Planner() {
                     editor.replace({ ...route, name: e.target.value }, false)
                   }
                 />
-                <Stats value={stat} />
-                {stat.pointCount > 0 && stat.elevationCoverage < 1 && (
-                  <div className="inline-warning">
-                    Altitudes{" "}
-                    {stat.elevationCoverage === 0
-                      ? "absentes"
-                      : `partielles (${Math.round(stat.elevationCoverage * 100)} %)`}{" "}
-                    : D+ et D−{" "}
-                    {stat.elevationCoverage === 0
-                      ? "indisponibles"
-                      : "incomplets"}
-                    .
-                  </div>
-                )}
-                {stat.gaps > 0 && (
-                  <div className="inline-warning">
-                    {stat.gaps} rupture(s) de trace conservée(s). Les distances
-                    entre segments séparés ne sont pas comptées.
-                  </div>
-                )}
+                <RouteStatisticsPanel key={route.id} route={route} analysis={analysis} />
                 <div className="history-tools">
                   <span>{storage.status}</span>
                   <Button
@@ -1135,8 +1071,8 @@ export default function Planner() {
                   value={base}
                   onChange={(e) => setBase(e.target.value)}
                 >
-                  <option value="topo">Relief</option>
                   <option value="osm">Classique</option>
+                  <option value="topo">Relief</option>
                 </select>
               </label>
               <button
