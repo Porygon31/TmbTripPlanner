@@ -294,9 +294,6 @@ body {
 .tmb-start-label span { display: block; margin-top: 3px; font-size: max(9px, calc(10px * var(--tmb-start-scale))); font-weight: 600; color: #99502c; }
 .poi-legend-start { margin-bottom: 4px; color: #904321; background: #fff3e9; font-weight: 700; }
 .poi-legend-start small { display: block; margin-top: 2px; font-size: 10px; font-weight: 500; }
-.poi-popup .leaflet-popup-content-wrapper { border: 6px solid var(--primary); }
-.poi-popup .leaflet-popup-tip { background: var(--primary); }
-.leaflet-container .poi-popup a.leaflet-popup-close-button { top: 6px; right: 6px; }
 .poi-popup .leaflet-popup-content { max-width: calc(100vw - 90px); font-size: 14px; line-height: 1.5; }
 .poi-popup .leaflet-popup-content p { margin: 7px 0; }
 .poi-popup .leaflet-popup-content > a { font-size: 12px; }
