@@ -4,6 +4,7 @@ export type PointOfInterest = RoutePoint & {
   name: string;
   type: string;
   url: string;
+  website?: string;
 };
 export type Provenance = {
   kind: "osm" | "routing" | "import";

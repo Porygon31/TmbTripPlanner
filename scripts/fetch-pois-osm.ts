@@ -1,5 +1,6 @@
 import fs from "node:fs/promises";
 import { distance } from "../lib/tmb/geo";
+import { lodgingWebsite } from "../lib/tmb/poi-websites.js";
 import type { Catalog, RoutePoint } from "../lib/tmb/types";
 const catalog = JSON.parse(
   await fs.readFile("public/data/catalog.json", "utf8"),
@@ -89,6 +90,7 @@ for (let i = 0; i < centers.length; i++) {
       ...(Number.isFinite(+t.ele) ? { ele: +t.ele } : {}),
       version: e.version,
       url: `https://www.openstreetmap.org/${e.type}/${e.id}`,
+      website: lodgingWebsite(type, t),
     });
   }
   console.log(`POI excerpt ${i + 1}/${centers.length}: ${all.size} points`);

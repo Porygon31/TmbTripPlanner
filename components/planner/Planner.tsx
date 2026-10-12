@@ -1045,7 +1045,14 @@ export default function Planner() {
               base={base}
               onPoint={mapClick}
               onAddPoi={addPoi}
-              onPoiOpen={() => setPoiExpanded(false)}
+              onPoiOpen={() => {
+                setPoiExpanded(false);
+                setNotice("");
+                if (window.matchMedia("(max-width: 700px)").matches) {
+                  setPanel("collapsed");
+                  setMobileProfile(false);
+                }
+              }}
               addingPoi={busy || enriching}
               onMove={moveWaypoint}
               hover={hover}

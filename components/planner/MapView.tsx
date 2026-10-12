@@ -13,9 +13,10 @@ import {
 import L from "leaflet";
 import { renderToStaticMarkup } from "react-dom/server";
 import { POI_CATEGORIES, PoiSymbol, TMB_START_POI_ID } from "./poi-categories";
-import { Plus, Check, LoaderCircle } from "lucide-react";
+import { Plus, Check, LoaderCircle, ExternalLink } from "lucide-react";
 import { samePoint } from "@/lib/tmb/geo";
 import { routeStops } from "@/lib/tmb/loop";
+import { lodgingWebsite } from "@/lib/tmb/poi-websites.js";
 import { useEffect, useMemo, useState, useRef, type ComponentProps, type CSSProperties } from "react";
 import type { Catalog, MapProvider, Route, RoutePoint, PointOfInterest } from "@/lib/tmb/types";
 export const providers: MapProvider[] = [
@@ -45,6 +46,16 @@ const poiIcons = Object.fromEntries(POI_CATEGORIES.filter(category => category.i
   iconAnchor: [13, 13],
   popupAnchor: [0, -15],
 })]));
+function PoiPopup({ children }: Pick<ComponentProps<typeof Popup>, "children">) {
+  const map = useMap();
+  const [compact, setCompact] = useState(() => map.getSize().x <= 700);
+  const events = useMemo(() => ({ resize: () => setCompact(map.getSize().x <= 700) }), [map]);
+  useMapEvents(events);
+  return <Popup className="poi-popup" minWidth={230} maxWidth={280}
+    autoPanPaddingTopLeft={[16, 112]} autoPanPaddingBottomRight={[16, compact ? 215 : 90]}>
+    {children}
+  </Popup>;
+}
 function HouchesMarker({ name, children, ...props }: Omit<ComponentProps<typeof Marker>, "icon"> & { name: string }) {
   const map = useMap();
   const [compact, setCompact] = useState(() => map.getSize().x <= 700);
@@ -252,19 +263,26 @@ export default function MapView({
           const category = POI_CATEGORIES.find(c => c.id === (isStart ? "start" : p.type));
           if (!category) return null;
           const alreadyLast = !!lastWaypoint && samePoint(lastWaypoint, p);
+          const website = lodgingWebsite(p.type, { website: p.website });
           const markerProps = {
             position: [p.lat, p.lon] as [number, number],
             title: `${category.singular} · ${p.name}`,
             alt: `${category.singular} · ${p.name}`,
             zIndexOffset: isStart ? 500 : -100,
             bubblingMouseEvents: false,
-            eventHandlers: { click: () => onPoiOpen?.() },
+            eventHandlers: { popupopen: () => onPoiOpen?.() },
           };
-          const popup = <Popup className="poi-popup" minWidth={230} maxWidth={280} autoPanPaddingTopLeft={[16, 112]} autoPanPaddingBottomRight={[16, 90]}>
+          const popup = <PoiPopup>
               <strong>{p.name}</strong>
               <p>
                 {category.singular} {p.ele === undefined ? "" : `· ${p.ele} m`}
               </p>
+              {website && (
+                <a className="poi-website" href={website} target="_blank" rel="noopener noreferrer"
+                  aria-label={`Site de l’hébergement : ${p.name} (nouvel onglet)`}>
+                  <ExternalLink size={15} aria-hidden="true" /> Site de l’hébergement
+                </a>
+              )}
               <a href={p.url} target="_blank" rel="noreferrer">
                 Source OpenStreetMap
               </a>
@@ -282,7 +300,7 @@ export default function MapView({
                   {alreadyLast ? "Déjà en fin de parcours" : addingPoi ? "Calcul en cours…" : "Ajouter au parcours"}
                 </button>
               )}
-            </Popup>;
+            </PoiPopup>;
           return isStart ?
             <HouchesMarker key={p.id} {...markerProps} name={p.name}>{popup}</HouchesMarker> :
             <Marker key={p.id} {...markerProps} icon={poiIcons[category.id]}>

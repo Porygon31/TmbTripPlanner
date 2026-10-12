@@ -108,6 +108,7 @@ export default function HelpPage() {
           <Chapter index={3}>
             <p>Ouvrez <strong>Points d’intérêt</strong> en bas à droite de la carte. Cochez les catégories à afficher ; chaque catégorie possède sa couleur et son symbole.</p>
             <ul className="help-poi-list">{POI_CATEGORIES.map(category => <li key={category.id}><PoiSymbol category={category} />{category.label}</li>)}</ul>
+            <p>Les fiches des refuges et hôtels affichent <strong>Site de l’hébergement</strong> lorsqu’un lien est renseigné dans les données OpenStreetMap. Il s’ouvre dans un nouvel onglet pour consulter les informations de l’établissement.</p>
             <ol>
               <li>Cliquez sur le symbole du lieu sur la carte.</li>
               <li>Dans sa fiche, cliquez sur <strong>Ajouter au parcours</strong>.</li>

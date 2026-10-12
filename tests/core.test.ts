@@ -16,8 +16,23 @@ import * as routeEditor from "../lib/tmb/editor";
 import {dailyStatistics}from'../lib/tmb/stages';
 import {validateStoredRoute}from'../lib/tmb/storage';
 import { selectRouteSection, combineSegmentStatistics } from "../lib/tmb/sections";
+import { safeWebsiteUrl, lodgingWebsite } from "../lib/tmb/poi-websites.js";
 import type { Catalog, RoutePoint, RoutingProvider } from "../lib/tmb/types";
 const parser = DOMParser as unknown as typeof globalThis.DOMParser;
+test("lodging links accept only absolute web addresses without embedded credentials", () => {
+  assert.equal(safeWebsiteUrl(" https://www.auberge-bionnassay.com/ "), "https://www.auberge-bionnassay.com/");
+  assert.equal(safeWebsiteUrl("http://chaletdutour.ffcam.fr/"), "http://chaletdutour.ffcam.fr/");
+  for (const value of [undefined, "", "/hotel", "javascript:alert(1)", "data:text/html,hello", "ftp://example.org", "https://user:password@example.org", "https://exa\nmple.org", "not a URL"]) {
+    assert.equal(safeWebsiteUrl(value), undefined, String(value));
+  }
+});
+test("lodgings use website then contact:website, and missing websites stay absent", () => {
+  assert.equal(lodgingWebsite("hotel", { website: "https://all.accor.com/hotel/B9P8/index.fr.shtml", "contact:website": "https://example.org/" }), "https://all.accor.com/hotel/B9P8/index.fr.shtml");
+  assert.equal(lodgingWebsite("refuge", { "contact:website": "http://chaletdutour.ffcam.fr/" }), "http://chaletdutour.ffcam.fr/");
+  assert.equal(lodgingWebsite("hotel", { website: "javascript:alert(1)", "contact:website": "https://example.org/" }), "https://example.org/");
+  assert.equal(lodgingWebsite("hotel", {}), undefined);
+  assert.equal(lodgingWebsite("village", { website: "https://example.org/" }), undefined);
+});
 const catalog = JSON.parse(
   fs.readFileSync("public/data/catalog.json", "utf8"),
 ) as Catalog;
