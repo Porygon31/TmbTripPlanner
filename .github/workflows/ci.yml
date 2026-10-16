@@ -71,6 +71,27 @@ jobs:
           path: dist
           retention-days: 30
 
+      - name: Artefact GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    name: Mise en ligne (GitHub Pages)
+    needs: build-test
+    # Seulement sur un push de la branche par défaut : jamais depuis une PR ou une autre branche.
+    if: github.event_name != 'pull_request' && github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
+
   e2e-live:
     name: E2E en conditions réelles (tuiles, BRouter, Open-Meteo)
     needs: build-test
