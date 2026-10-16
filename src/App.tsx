@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
-import { Disclaimer, SafetyNote } from './components/common/Disclaimer';
+import { SafetyNote } from './components/common/Disclaimer';
+import { Guide } from './components/common/Guide';
 import { Toasts } from './components/common/Toasts';
 import { MapView } from './components/map/MapView';
 import { ImportPanel } from './components/panels/ImportPanel';
@@ -8,6 +9,7 @@ import { RoutePanel } from './components/panels/RoutePanel';
 import { VariantsPanel } from './components/panels/VariantsPanel';
 import { ProfilePanel } from './components/profile/ProfilePanel';
 import { routeStatistics } from './core/route/stats';
+import { buildRouteGeometry } from './core/route/geometry';
 import { startAutosave } from './state/persistence';
 import { startSegmentResolver } from './state/segmentResolver';
 import { useApp, type PanelId, type SheetState } from './state/store';
@@ -16,10 +18,8 @@ import { Icon, type IconName } from './ui/Icon';
 import { MOBILE_QUERY, useMediaQuery } from './ui/useMediaQuery';
 
 const TABS: { id: PanelId; label: string; icon: IconName }[] = [
-  { id: 'route', label: 'Itinéraire', icon: 'route' },
-  { id: 'variants', label: 'Variantes', icon: 'mountain' },
-  { id: 'import', label: 'Import', icon: 'upload' },
-  { id: 'project', label: 'Projet', icon: 'folder' },
+  { id: 'variants', label: 'Explorer', icon: 'layers' },
+  { id: 'route', label: 'Mon parcours', icon: 'route' },
 ];
 
 let started = false;
@@ -68,6 +68,7 @@ function RouteSummary() {
 
 function Tabs() {
   const panel = useApp((s) => s.panel);
+  const count = useApp((s) => s.history.present.waypoints.length);
   return (
     <nav className="tabs" role="tablist" aria-label="Panneaux">
       {TABS.map((t) => (
@@ -82,6 +83,7 @@ function Tabs() {
         >
           <Icon name={t.icon} />
           <span>{t.label}</span>
+          {t.id === 'route' && count > 0 && <small className="tab-count">{count}</small>}
         </button>
       ))}
     </nav>
@@ -91,13 +93,15 @@ function Tabs() {
 function PanelBody({ mobile }: { mobile: boolean }) {
   const panel = useApp((s) => s.panel);
   return (
-    <div className="panel-scroll">
+    <div className="panel-scroll" key={panel}>
+      {(panel === 'import' || panel === 'project') && <button className="btn btn-text panel-back" onClick={() => useApp.getState().setPanel('route')}>← Mon parcours</button>}
       {mobile && panel === 'route' && <ProfilePanel embedded />}
       {panel === 'route' && <RoutePanel />}
       {panel === 'variants' && <VariantsPanel />}
       {panel === 'import' && <ImportPanel />}
       {panel === 'project' && <ProjectPanel />}
       <SafetyNote />
+      <footer className="sidebar-footer"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">© OpenStreetMap · ODbL</a><span>Routage : BRouter · Altitudes : sources GPX / modèle de terrain</span><button className="btn btn-text" data-testid="tab-project" onClick={() => useApp.getState().setPanel('project')}><Icon name="folder" size={14} /> Sauvegardes et réglages</button></footer>
     </div>
   );
 }
@@ -136,22 +140,25 @@ function SheetHandle() {
 export default function App() {
   const mobile = useMediaQuery(MOBILE_QUERY);
   const sheet = useApp((s) => s.sheet);
+  const route = useApp((s) => s.history.present);
+  const tutorial = useApp((s) => s.tutorialActive);
   useEffect(startOnce, []);
   useKeyboardShortcuts();
   return (
-    <div className={`app ${mobile ? 'is-mobile' : 'is-desktop'}`}>
-      <Disclaimer />
+    <div className={`app ${mobile ? 'is-mobile' : 'is-desktop'} ${tutorial ? 'tutorial-active' : ''}`}>
+      <header className="topbar">
+        <a className="atelier-brand" href="#" onClick={(e) => { e.preventDefault(); useApp.getState().setPanel('variants'); }} aria-label="TMB Atelier, explorer le catalogue"><span className="brand-icon"><Icon name="mountain" size={30} /></span><span>TMB <strong>Atelier</strong><small>LE TOUR COMMENCE ICI</small></span></a>
+        <div className="top-caption">France <span>·</span> Italie <span>·</span> Suisse</div>
+        <div className="header-actions">
+          <Guide />
+          <button className="btn" data-testid="tab-import" onClick={() => useApp.getState().setPanel('import')} aria-label="Importer un GPX"><Icon name="upload" size={16} /><span>Importer</span></button>
+          <button className="btn btn-primary" data-tour="export" data-testid="header-export" onClick={() => useApp.getState().exportGpx(false)} disabled={route.waypoints.length < 2 || !buildRouteGeometry(route).complete} aria-label="Exporter GPX"><Icon name="download" size={16} /><span>Exporter GPX</span></button>
+        </div>
+      </header>
       <aside className={`sidebar sheet-${sheet}`} aria-label="Itinéraire, variantes et projet">
         {mobile && <SheetHandle />}
-        <header className="brand">
-          <div className="brand-title">
-            <svg width="22" height="22" viewBox="0 0 64 64" aria-hidden>
-              <path d="M6 50 L24 20 L32 32 L40 16 L58 50 Z" fill="currentColor" />
-            </svg>
-            <h1>TMB Trip Planner</h1>
-          </div>
-          <RouteSummary />
-        </header>
+        <div className="sidebar-intro"><span className="eyebrow">VOTRE PROCHAINE AVENTURE</span><h1>Un tour.<br />Mille façons de le vivre.</h1><p>Composez votre itinéraire autour du Mont-Blanc, un sentier à la fois.</p></div>
+        {mobile && <div className="mobile-summary"><RouteSummary /></div>}
         <Tabs />
         <PanelBody mobile={mobile} />
       </aside>

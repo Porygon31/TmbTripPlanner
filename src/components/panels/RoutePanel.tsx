@@ -130,8 +130,9 @@ export function RoutePanel() {
 
   return (
     <div className="panel" data-testid="route-panel">
+      <div className="section-heading"><h2>{basedOnMain ? 'Votre Tour du Mont-Blanc' : 'Votre parcours libre'}</h2><span>{route.segments.length} SEGMENTS</span></div>
       <div className="field">
-        <label htmlFor="route-name">Nom de l’itinéraire</label>
+        <label htmlFor="route-name">Nom du parcours</label>
         <input id="route-name" key={route.id + route.name} defaultValue={route.name} onBlur={(e) => s.renameRoute(e.target.value)} />
       </div>
 
@@ -142,7 +143,7 @@ export function RoutePanel() {
         </button>
         {hasMain && !basedOnMain && (
           <button type="button" className="btn" onClick={() => void s.startFromMain()} data-testid="start-from-main">
-            <Icon name="mountain" /> Partir du TMB officiel
+            <Icon name="mountain" /> Partir du TMB classique
           </button>
         )}
       </div>
@@ -152,10 +153,11 @@ export function RoutePanel() {
           <p>
             <strong>Votre itinéraire est vide.</strong>
           </p>
+          {canUndo && <button className="btn btn-small" onClick={() => s.undo()}><Icon name="undo" size={16} /> Annuler</button>}
           <ul>
             <li>« Créer mon itinéraire », puis touchez la carte : chaque point est relié au précédent en suivant les sentiers.</li>
-            {hasMain && <li>« Partir du TMB officiel » puis ajoutez des variantes depuis l’onglet Variantes.</li>}
-            <li>Ou importez un GPX (onglet Import) et utilisez-le comme base.</li>
+            {hasMain && <li>« Partir du TMB classique » puis ajoutez des variantes depuis Explorer.</li>}
+            <li>Ou importez un GPX avec Importer, en haut à droite, et utilisez-le comme base.</li>
           </ul>
         </div>
       ) : (
@@ -188,8 +190,7 @@ export function RoutePanel() {
             </button>
           </div>
 
-          <h3>Exporter</h3>
-          <div className="export-box">
+          <details className="export-options"><summary>Options d’export GPX</summary><div className="export-box">
             <button
               type="button"
               className="btn btn-primary btn-large"
@@ -207,14 +208,16 @@ export function RoutePanel() {
             {!geometry.complete && <p className="muted small">L’export sera disponible une fois tous les tronçons calculés.</p>}
           </div>
 
-          <h3>Étapes</h3>
-          <Stages route={route} />
+          </details>
 
           <h3>Points ({route.waypoints.length})</h3>
           <WaypointList route={route} />
+          <h3>Vos étapes</h3>
+          <Stages route={route} />
           <p className="muted small">{TIME_NOTE}</p>
         </>
       )}
+      <div className="route-actions" data-tour="save"><button className="btn btn-primary" onClick={() => void s.saveProject()}><Icon name="save" size={16} /> Sauvegarder</button><button className="btn" onClick={() => void s.restoreLast()}><Icon name="refresh" size={16} /> Restaurer le dernier parcours</button><button className="btn" onClick={() => { if (!route.waypoints.length || confirm('Commencer un nouveau parcours ? Le précédent restera récupérable.')) void s.newProject(); }}><Icon name="plus" size={16} /> Nouveau parcours</button><button className="btn btn-text" onClick={() => s.setPanel('variants')}><Icon name="layers" size={16} /> Choisir les variantes</button></div>
     </div>
   );
 }

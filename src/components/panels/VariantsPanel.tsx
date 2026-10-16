@@ -1,7 +1,7 @@
 import type { CatalogTrackInfo, DataSource, Reference, TmbVariant } from '../../core/types';
 import { trackStatistics } from '../../state/selectors';
 import { MAIN_ID, useApp } from '../../state/store';
-import { kmOnTmb, meters, signedKm, signedMeters } from '../../ui/format';
+import { km, kmOnTmb, meters, signedKm, signedMeters } from '../../ui/format';
 import { Icon } from '../../ui/Icon';
 import { TMB_COLOR } from '../map/TrackLayers';
 import { StatsGrid } from './StatsGrid';
@@ -66,15 +66,16 @@ function Warnings({ warnings }: { warnings: string[] }) {
   );
 }
 
-function TrackActions({ id }: { id: string }) {
+function TrackActions({ id, secondary = false }: { id: string; secondary?: boolean }) {
   const visible = useApp((s) => !!s.visible[id]);
   const loading = useApp((s) => s.trackStatus[id]);
   const s = useApp.getState();
   return (
     <>
-      <button type="button" className={`btn btn-small ${visible ? 'btn-active' : ''}`} onClick={() => s.toggleVisible(id)} aria-pressed={visible} data-testid={`show-${id}`}>
-        <Icon name={visible ? 'eye' : 'eyeOff'} size={16} /> {visible ? 'Affichée' : 'Afficher sur la carte'}
-      </button>
+      {!secondary && <button type="button" className="btn btn-small btn-text" onClick={() => s.toggleVisible(id)} aria-pressed={visible} data-testid={`show-${id}`}>
+        <Icon name="eye" size={16} /> {visible ? 'Masquer' : 'Voir la trace'}
+      </button>}
+      {secondary && <>
       <button
         type="button"
         className="btn btn-small"
@@ -97,6 +98,7 @@ function TrackActions({ id }: { id: string }) {
       </button>
       {loading === 'loading' && <span className="muted small">chargement…</span>}
       {loading === 'elevation' && <span className="muted small">altitudes…</span>}
+      </>}
     </>
   );
 }
@@ -104,21 +106,13 @@ function TrackActions({ id }: { id: string }) {
 function MainCard({ main }: { main: CatalogTrackInfo }) {
   const stats = useApp((s) => trackStatistics(s, MAIN_ID)) ?? main.stats;
   return (
-    <article className="card" data-testid="main-card">
-      <header className="card-header">
-        <span className="swatch" style={{ background: TMB_COLOR }} aria-hidden />
-        <h3>{main.name}</h3>
-      </header>
-      {main.description && <p className="desc">{main.description}</p>}
-      <StatsGrid stats={stats} compact />
-      <div className="row gap-s wrap">
-        <TrackActions id={MAIN_ID} />
-        <button type="button" className="btn btn-small btn-primary" onClick={() => void useApp.getState().startFromMain()}>
-          <Icon name="route" size={16} /> Partir de ce tracé
-        </button>
-      </div>
-      <SourceLine source={main.source} references={main.references ?? []} />
-      <Warnings warnings={main.warnings} />
+    <article className="classic-card" data-testid="main-card" data-tour="classic">
+      <div className="route-card-top"><span className="route-dot" style={{ background: TMB_COLOR }} /> FR · IT · CH <Icon name="mountain" size={20} /></div>
+      <h3>Tour du Mont-Blanc</h3>
+      <p>La boucle de référence, au départ des Houches.</p>
+      <div className="card-stats"><strong>{(stats.distance / 1000).toLocaleString('fr-FR', { maximumFractionDigits: 1 })}<small> km</small></strong><span>Sens antihoraire</span></div>
+      <button type="button" className="btn btn-primary full-width" data-testid="classic-start" onClick={() => void useApp.getState().startFromMain()}>Personnaliser ce tour <span aria-hidden>↗</span></button>
+      <details className="track-details"><summary>TMB classique — données OpenStreetMap <Icon name="info" size={12} /></summary><p>{main.name}</p><StatsGrid stats={stats} compact /><div className="row wrap"><TrackActions id={MAIN_ID} /><TrackActions id={MAIN_ID} secondary /></div><SourceLine source={main.source} references={main.references ?? []} /><Warnings warnings={main.warnings} /></details>
     </article>
   );
 }
@@ -131,17 +125,24 @@ function VariantCard({ v }: { v: TmbVariant }) {
   const dep = v.departure ? (v.departure.name ?? kmOnTmb(v.departure.distOnMain)) : null;
   const rej = v.rejoin ? (v.rejoin.name ?? kmOnTmb(v.rejoin.distOnMain)) : null;
   return (
-    <article className={`card ${included ? 'card-included' : ''}`} data-testid={`variant-${v.id}`}>
+    <article className={`variant-card ${included ? 'card-included' : ''}`} data-testid={`variant-${v.id}`} data-tour="variant">
       <header className="card-header">
-        <span className="swatch" style={{ background: v.color }} aria-hidden />
+        <span className="route-dot" style={{ background: v.color }} aria-hidden />
         <h3>{v.name}</h3>
-        {included && <span className="tag">Dans mon itinéraire</span>}
       </header>
       <p className={`desc ${v.description ? '' : 'muted'}`}>{v.description ?? 'Description non renseignée.'}</p>
+      <div className="variant-meta"><span><b>{km(stats.distance)}</b> · ↗ {meters(stats.ascent)}</span><span title={v.difficulty.criteria.join('\n')}>{v.difficulty.label}{v.difficulty.origin === 'estimated' ? ' · estimée' : ''}</span></div>
+      <div className="variant-delta"><span data-testid="delta-distance">{signedKm(v.deltaDistance)}</span> par rapport au classique remplacé</div>
+      <div className="variant-actions">
+        <TrackActions id={v.id} />
+        {included && basedOnMain ? <button className="btn btn-small btn-active" onClick={() => s.removeVariantFromRoute(v.id)} title="Retirer la variante et restaurer la portion classique"><Icon name="check" size={14} /> Intégrée</button> : <button className="btn btn-small" onClick={() => void s.addTrackToRoute(v.id)} disabled={included} data-testid={`add-${v.id}`}><Icon name={included ? 'check' : 'plus'} size={14} />{included ? 'Intégrée' : 'Intégrer'}</button>}
+      </div>
+      <details className="variant-details"><summary><Icon name="info" size={12} /> Détails et sources</summary>
+      {v.description && <p>{v.description}</p>}
       <dl className="facts">
         <div>
           <dt>Écart vs TMB classique</dt>
-          <dd data-testid="delta-distance">{signedKm(v.deltaDistance)}</dd>
+          <dd>{signedKm(v.deltaDistance)}</dd>
         </div>
         <div>
           <dt>Dénivelé (D+ / D−)</dt>
@@ -186,19 +187,11 @@ function VariantCard({ v }: { v: TmbVariant }) {
         </details>
       )}
       <div className="row gap-s wrap">
-        <TrackActions id={v.id} />
-        {included && basedOnMain ? (
-          <button type="button" className="btn btn-small btn-danger" onClick={() => s.removeVariantFromRoute(v.id)}>
-            <Icon name="minus" size={16} /> Retirer de mon itinéraire
-          </button>
-        ) : (
-          <button type="button" className="btn btn-small btn-primary" onClick={() => void s.addTrackToRoute(v.id)} disabled={included} data-testid={`add-${v.id}`}>
-            <Icon name="plus" size={16} /> Ajouter à mon itinéraire
-          </button>
-        )}
+        <TrackActions id={v.id} secondary />
       </div>
       <SourceLine source={v.source} references={v.references ?? []} />
       <Warnings warnings={v.warnings} />
+      </details>
     </article>
   );
 }
@@ -211,7 +204,7 @@ export function VariantsPanel() {
   return (
     <div className="panel" data-testid="variants-panel">
       {catalog.main ? (
-        <MainCard main={catalog.main} />
+        <><div className="section-heading"><h2>Le grand classique</h2><span>01 ITINÉRAIRE</span></div><MainCard main={catalog.main} /></>
       ) : (
         <div className="empty">
           <p>
@@ -226,16 +219,14 @@ export function VariantsPanel() {
       )}
       {catalog.variants.length > 0 && (
         <>
-          <h2 className="section-title">Variantes ({catalog.variants.length})</h2>
-          <p className="muted small">
-            Triées dans le sens du TMB. « Ajouter à mon itinéraire » remplace le tronçon classique correspondant (sans doublon ni trou).
-          </p>
+          <div className="section-heading"><h2>Changez de perspective</h2><span>{catalog.variants.length} VARIANTES</span></div>
           {catalog.variants.map((v) => (
             <VariantCard key={v.id} v={v} />
           ))}
         </>
       )}
       {catalog.warnings.length > 0 && <Warnings warnings={catalog.warnings} />}
+      <button className="btn full-width" onClick={() => { const s = useApp.getState(); if (!s.history.present.waypoints.length || s.tutorialActive || confirm('Commencer un parcours libre ? Le précédent restera récupérable.')) void s.newProject(); }}><Icon name="plus" size={16} /> Créer un parcours libre</button>
     </div>
   );
 }

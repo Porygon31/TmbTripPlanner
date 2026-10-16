@@ -14,7 +14,7 @@ for (const viewport of [{ width: 1400, height: 900 }, { width: 390, height: 844 
     await page.getByTestId('tab-variants').click();
     await expect(page.getByTestId('main-card')).toContainText('TMB classique — données OpenStreetMap');
     await expect(page.locator('[data-testid^="variant-"]')).toHaveCount(7);
-    await page.getByTestId('main-card').getByRole('button', { name: 'Partir de ce tracé' }).click();
+    await page.getByTestId('classic-start').click();
     await waitRouted(page);
     await page.getByTestId('tab-variants').click();
     await page.getByTestId('add-le-tour').click();

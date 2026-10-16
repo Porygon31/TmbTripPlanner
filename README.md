@@ -1,20 +1,24 @@
-# TMB Trip Planner
+# TMB Atelier · TmbTripPlanner
 
-Outil web de préparation d'un **Tour du Mont-Blanc personnalisé**. On part du tracé de référence OpenStreetMap, on affiche et on combine les variantes réelles, on crée ou on modifie son propre parcours sur une carte topographique en suivant les sentiers, puis on exporte le résultat en **GPX 1.1**.
+Outil web de préparation d'un **Tour du Mont-Blanc personnalisé**. On part du tracé de référence OpenStreetMap, on affiche et on combine les variantes réelles, on crée ou on modifie son propre parcours en suivant les sentiers, puis on exporte le résultat en **GPX 1.1**.
+
+L’interface reprend **TMB Atelier** : en-tête, catalogue Explorer / Mon parcours, fond Classique par défaut, couleurs des variantes, profil orange et légende des lieux en bas à droite. Les autres fonds et réglages de routage restent disponibles. Les boutons Aide et Tutoriel ouvrent un guide et un exercice en quinze étapes ; le parcours d’essai est exclu de l’autosauvegarde et le parcours personnel est restauré à la sortie.
+
+L’extrait intégré `data/pois.osm.json` contient 160 lieux issus d’OpenStreetMap (ODbL), avec source, date d’extraction et versions. Il est converti en `public/data/pois.json` à la compilation. Les fiches permettent d’ajouter un lieu au parcours et d’ouvrir le site d’un hébergement lorsqu’il est renseigné. Les sauvegardes sont propres à chaque domaine : pour transférer un parcours depuis l’ancien site Sites, exportez puis importez son GPX.
 
 **Site en ligne : https://porygon31.github.io/TmbTripPlanner/** (mis à jour automatiquement à chaque push sur la branche par défaut, une fois les tests passés).
 
-> ⚠️ **Sécurité** : les itinéraires sont indicatifs et **jamais garantis praticables**. La météo, la neige et les fermetures de sentiers peuvent tout changer. Vérifiez toujours les conditions locales avant de partir (voir l'onglet *Projet → Sécurité et conditions*).
+> ⚠️ **Sécurité** : les itinéraires sont indicatifs et **jamais garantis praticables**. La météo, la neige et les fermetures de sentiers peuvent tout changer. Vérifiez toujours les conditions locales avant de partir (voir *Sauvegardes et réglages → Sécurité et conditions*).
 
 ## Fonctionnalités
 
 | | |
 | --- | --- |
-| **Carte** | Leaflet avec plusieurs fonds de carte, tous sans clé d'API : topographique (OpenTopoMap), classique (OSM), relief/terrain et satellite (Esri), Plan IGN (France), Swisstopo (Suisse). Surcouches : sentiers balisés (Waymarked Trails), ombrage du relief, refuges/cols/sommets/villages (OSM). Zoom, plein écran, géolocalisation, échelle. |
+| **Carte** | Leaflet avec fond Classique (OSM) par défaut. Autres fonds sans clé : topographique (OpenTopoMap), relief/terrain et satellite (Esri), Plan IGN (France), Swisstopo (Suisse). Surcouches : sentiers balisés et ombrage du relief. Légende séparée des refuges, hôtels, cols, sommets et villages ; Les Houches visible par défaut. Zoom, plein écran et géolocalisation. |
 | **TMB et variantes** | Tracé de référence et variantes chargés depuis `data/`. Chaque fiche donne la distance, l'écart de distance et de D+ par rapport au tronçon classique, l'altitude max, la difficulté (fournie ou estimée), les points de départ et de jonction, la source et la licence. On peut afficher plusieurs variantes à la fois, chacune dans sa couleur. |
 | **Créer mon itinéraire** | Chaque clic ajoute un point, et le tronçon est calculé **sur les sentiers** par un moteur de routage randonnée (BRouter `hiking-mountain` par défaut). Ce n'est jamais une ligne droite implicite. |
 | **Édition** | Déplacer un point (seuls les tronçons voisins sont recalculés), en insérer un (clic sur le tracé ou glisser une poignée), supprimer, réordonner, inverser le sens, annuler/rétablir (Ctrl+Z / Ctrl+Y), tout effacer. Sur une longue trace figée (TMB, import), seule la zone modifiée (≈ 1,5 km) est recalculée. |
-| **TMB personnalisé** | « Partir du TMB officiel », puis « Ajouter à mon itinéraire » sur une variante : le tronçon classique est remplacé par la variante, sans doublon, sans segment inversé et sans trou. Les chevauchements sont refusés avec un message explicite, et le retrait d'une variante restaure le tronçon classique. |
+| **TMB personnalisé** | « Personnaliser ce tour », puis « Intégrer » sur une variante : le tronçon classique est remplacé par la variante, sans doublon, sans segment inversé et sans trou. Les chevauchements sont refusés avec un message explicite. « Intégrée » retire la variante et restaure le tronçon classique. |
 | **Import GPX** | Fichier `.gpx` affiché sur la carte avec son nom, la distance, D+, D−, altitudes min et max et le nombre de points. Si le fichier n'a pas d'altitude, elle est complétée en ligne. « Utiliser comme base » le transforme en itinéraire modifiable. |
 | **Export GPX** | GPX 1.1 conforme au schéma officiel : coordonnées, ordre, altitude, nom, points de départ, d'arrivée et de fin d'étape. Au choix, une trace unique ou une trace par étape. Téléchargement direct depuis le navigateur. |
 | **Profil altimétrique** | Graphique interactif (uPlot). Le survol du profil met en évidence le point sur la carte, et le survol de la carte surligne le tronçon correspondant sur le profil. |

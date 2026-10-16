@@ -68,7 +68,8 @@ async function readTrack(entry: CatalogConfigEntry, id: string, kind: Track['kin
     return null;
   }
   const parsed = parseGpxString(await readFile(path, 'utf8'), parser);
-  return gpxToTrack(parsed, id, kind, basename(entry.file, '.gpx'));
+  const track = gpxToTrack(parsed, id, kind, basename(entry.file, '.gpx'));
+  return { ...track, name: entry.name ?? track.name };
 }
 
 function gapWarnings(points: RoutePoint[]): string[] {
@@ -245,6 +246,15 @@ async function main() {
   }
   catalog.variants.sort((a, b) => (a.departure?.distOnMain ?? Infinity) - (b.departure?.distOnMain ?? Infinity));
   await writeFile(join(OUT, 'catalog.json'), JSON.stringify(catalog, null, 1));
+  // L’extrait est livré avec l’application : aucun appel Overpass au premier affichage.
+  try {
+    const source = JSON.parse(await readFile(join(SRC, 'pois.osm.json'), 'utf8')) as { points: { type: string; elevation?: number; ele?: number; [key: string]: unknown }[] };
+    const kinds: Record<string, string> = { refuge: 'hut', hotel: 'hotel', col: 'pass', sommet: 'peak', village: 'village', viewpoint: 'viewpoint' };
+    const points = source.points.map(({ type, elevation, ele, ...p }) => ({ ...p, kind: kinds[type] ?? type, ele: elevation ?? ele ?? null }));
+    await writeFile(join(OUT, 'pois.json'), JSON.stringify(points));
+  } catch (e) {
+    if ((e as NodeJS.ErrnoException).code !== 'ENOENT') throw e;
+  }
   log(`catalogue écrit : ${catalog.main ? 1 : 0} tracé principal, ${catalog.variants.length} variante(s)`);
 }
 

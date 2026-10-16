@@ -75,6 +75,8 @@ export interface AppState {
   toasts: Toast[];
   fitRequest: { bounds: Bounds; nonce: number } | null;
   restored: boolean;
+  /** Les exercices du tutoriel ne remplacent jamais le brouillon personnel. */
+  tutorialActive: boolean;
 
   // Données
   loadCatalog(): Promise<void>;
@@ -209,13 +211,14 @@ export const useApp = create<AppState>()((set, get) => {
     selectedTrack: null,
     profileTarget: ROUTE_TARGET,
     mode: 'view',
-    panel: 'route',
+    panel: 'variants',
     sheet: 'peek',
     history: createHistory(ops.emptyRoute()),
     settings: readPref<RoutingSettings>('routing', DEFAULT_ROUTING_SETTINGS),
     toasts: [],
     fitRequest: null,
     restored: false,
+    tutorialActive: false,
 
     async loadCatalog() {
       try {
@@ -394,7 +397,7 @@ export const useApp = create<AppState>()((set, get) => {
       commitRoute(routeFromMain(main, 'Mon Tour du Mont-Blanc'));
       set((s) => ({ profileTarget: ROUTE_TARGET, panel: 'route', visible: { ...s.visible, [MAIN_ID]: true } }));
       get().focusTrack(MAIN_ID);
-      toast('success', 'Itinéraire créé à partir du TMB officiel. Ajoutez des variantes depuis l’onglet Variantes.');
+      toast('success', 'Le classique est prêt. Choisissez vos variantes dans Explorer.');
     },
 
     async addTrackToRoute(trackId) {
@@ -547,12 +550,13 @@ export const useApp = create<AppState>()((set, get) => {
 
     async newProject() {
       const r = get().history.present;
-      if (r.waypoints.length > 0) await projectStore.saveLast(makeProject(r, get().imports.map((i) => get().tracks[i.id]).filter(Boolean)));
+      if (r.waypoints.length > 0 && !get().tutorialActive) await projectStore.saveLast(makeProject(r, get().imports.map((i) => get().tracks[i.id]).filter(Boolean)));
       set({ history: createHistory(ops.emptyRoute()), profileTarget: ROUTE_TARGET, mode: 'edit', panel: 'route' });
       toast('info', 'Nouveau parcours. L’ancien est récupérable via « Restaurer le dernier parcours ».');
     },
 
     async saveProject(name) {
+      if (get().tutorialActive) { toast('success', 'Sauvegarde d’essai réussie. Votre sauvegarde personnelle est préservée.'); return; }
       const r = get().history.present;
       const p = makeProject(r, get().imports.map((i) => get().tracks[i.id]).filter(Boolean));
       await projectStore.saveCurrent(p);
@@ -562,6 +566,7 @@ export const useApp = create<AppState>()((set, get) => {
     },
 
     async restoreLast() {
+      if (get().tutorialActive) { toast('info', 'Quittez le tutoriel pour retrouver vos parcours personnels.'); return false; }
       const p = await projectStore.loadLast();
       if (!p) {
         toast('info', 'Aucun parcours précédent à restaurer.');

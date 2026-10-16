@@ -1,12 +1,8 @@
 import { useMemo, useState } from 'react';
-import { computeStatistics } from '../../core/elevation/stats';
-import { routeStatistics } from '../../core/route/stats';
 import { effectiveTarget, targetGeometry } from '../../state/selectors';
 import { MAIN_ID, ROUTE_TARGET, useApp } from '../../state/store';
 import { Icon } from '../../ui/Icon';
-import { StatsGrid } from '../panels/StatsGrid';
 import { ROUTE_COLOR } from '../map/RouteLayer';
-import { TMB_COLOR } from '../map/TrackLayers';
 import { ElevationProfile } from './ElevationProfile';
 
 export function ProfilePanel({ embedded = false }: { embedded?: boolean }) {
@@ -23,16 +19,11 @@ export function ProfilePanel({ embedded = false }: { embedded?: boolean }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [effective, route.segments, route.waypoints, tracks],
   );
-  const stats = useMemo(() => {
-    if (effective === ROUTE_TARGET) return route.waypoints.length >= 2 ? routeStatistics(route) : null;
-    return geometry ? computeStatistics(geometry.points, geometry.cum) : null;
-  }, [effective, route, geometry]);
-
   const color =
     effective === ROUTE_TARGET
       ? ROUTE_COLOR
       : effective === MAIN_ID
-        ? TMB_COLOR
+        ? ROUTE_COLOR
         : (catalog?.variants.find((v) => v.id === effective)?.color ?? imports.find((i) => i.id === effective)?.color ?? ROUTE_COLOR);
   const name = effective === ROUTE_TARGET ? route.name : (useApp.getState().trackName(effective) ?? '');
 
@@ -45,7 +36,7 @@ export function ProfilePanel({ embedded = false }: { embedded?: boolean }) {
     <section className={`profile-panel ${open ? '' : 'collapsed'} ${embedded ? 'embedded' : ''}`} aria-label="Profil altimétrique">
       <header className="profile-header">
         <div className="profile-title">
-          <Icon name="chart" />
+          <span className="eyebrow">PROFIL ALTIMÉTRIQUE</span>
           <label className="sr-only" htmlFor="profile-target">
             Profil affiché
           </label>
@@ -63,7 +54,7 @@ export function ProfilePanel({ embedded = false }: { embedded?: boolean }) {
             ))}
           </select>
         </div>
-        {stats && <StatsGrid stats={stats} compact />}
+        <span className="profile-prompt">Survolez ou touchez pour explorer</span>
         {!embedded && (
           <button type="button" className="icon-btn" onClick={() => setOpen((o) => !o)} aria-label={open ? 'Replier le profil' : 'Déplier le profil'}>
             <Icon name={open ? 'down' : 'up'} />
@@ -85,6 +76,7 @@ export function ProfilePanel({ embedded = false }: { embedded?: boolean }) {
           )}
         </div>
       )}
+      {open && <p className="profile-foot">Altitudes issues des données disponibles · dénivelé filtré, seuil 5 m · les ruptures ne sont pas reliées</p>}
     </section>
   );
 }

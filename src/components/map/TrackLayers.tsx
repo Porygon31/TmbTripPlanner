@@ -8,7 +8,7 @@ import { effectiveTarget } from '../../state/selectors';
 import { MAIN_ID, useApp } from '../../state/store';
 import { displayLine } from './displayCache';
 
-export const TMB_COLOR = '#dc2626';
+export const TMB_COLOR = '#527c71';
 
 interface TrackLineProps {
   track: IndexedTrack;
@@ -53,7 +53,7 @@ const TrackLine = memo(function TrackLine({ track, color, label, weight, emphasi
       <Polyline positions={positions} pathOptions={{ color: '#ffffff', weight: weight + 3, opacity: 0.9 }} interactive={false} />
       <Polyline
         positions={positions}
-        pathOptions={{ color, weight, opacity: emphasized ? 1 : 0.85, lineCap: 'round', lineJoin: 'round' }}
+        pathOptions={{ color, weight, opacity: emphasized ? 0.9 : 0.75, lineCap: 'round', lineJoin: 'round', dashArray: track.id === MAIN_ID ? '6 5' : undefined }}
         eventHandlers={handlers}
       >
         <Tooltip sticky direction="top" offset={[0, -6]}>

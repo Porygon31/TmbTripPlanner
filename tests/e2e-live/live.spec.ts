@@ -42,7 +42,7 @@ test('tous les fonds de carte et calques répondent', async ({ page }) => {
   // Chaque fond est laissé affiché jusqu'à réception d'une tuile (changer trop tôt annule les requêtes en cours).
   for (const b of [...BASEMAPS, ...OVERLAYS]) {
     const host = new URL(b.url.replace('{s}', 'a')).host.replace(/^a\./, '');
-    if (b.id !== 'topo') {
+    {
       await page.evaluate((id) => {
         const s = window.__tmb.store.getState();
         if (['trails', 'hillshade'].includes(id)) s.toggleOverlay(id);
@@ -99,14 +99,13 @@ test('Open-Meteo complète les altitudes d’un GPX qui n’en a pas', async ({ 
   expect(stats.maxEle).toBeLessThan(1500);
 });
 
-test('points d’intérêt OpenStreetMap (Overpass) — informatif', async ({ page }) => {
-  const waiting = page.waitForResponse((r) => r.url().includes('overpass'), { timeout: 60_000 }).catch(() => null);
+test('points d’intérêt OpenStreetMap livrés avec le site', async ({ page }) => {
+  const waiting = page.waitForResponse((r) => r.url().endsWith('/data/pois.json'));
   await open(page);
   const res = await waiting;
-  if (!res || res.status() !== 200) {
-    console.warn(`⚠ Overpass indisponible (${res?.status() ?? 'pas de réponse'}) : couche POI vide, l’application reste utilisable.`);
-    return;
-  }
+  expect(res.status()).toBe(200);
   const json = await res.json();
-  expect(json.elements.length).toBeGreaterThan(10);
+  expect(json.length).toBeGreaterThan(100);
+  expect(json.some((p: { name: string }) => p.name === 'Les Houches')).toBe(true);
+  await expect(page.locator('[title="Les Houches — départ du TMB"]')).toBeVisible();
 });

@@ -32,7 +32,7 @@
     {
       "id": "col-de-tricot",
       "file": "gpx/variantes/col-de-tricot.gpx",
-      "name": "Variante du Col de Tricot",
+      "name": "Col de Tricot",
       "description": "Quitte l'itinéraire classique pour franchir le Col de Tricot, au plus près du glacier de Bionnassay, puis descend très raide vers les chalets de Miage avant de rejoindre Le Truc.",
       "source": {
         "label": "OpenStreetMap — relation 9678267 ; altitudes OpenRouteService/SRTM",
@@ -45,12 +45,13 @@
       "references": [],
       "difficulty": "SAC T2 · partiel",
       "departureName": null,
-      "rejoinName": null
+      "rejoinName": null,
+      "color": "#c58047"
     },
     {
       "id": "col-des-fours",
       "file": "gpx/variantes/col-des-fours.gpx",
-      "name": "Variante du Col des Fours",
+      "name": "Col des Fours",
       "description": "Évite le détour par Les Chapieux en passant par le Col des Fours, entre le refuge de la Croix du Bonhomme et La Ville des Glaciers. Descente raide sur schistes, névés fréquents en début de saison : par beau temps uniquement.",
       "source": {
         "label": "OpenStreetMap — relation 9678296 ; altitudes OpenRouteService/SRTM",
@@ -68,12 +69,13 @@
       ],
       "difficulty": "SAC T2",
       "departureName": "Refuge de la Croix du Bonhomme",
-      "rejoinName": "La Ville des Glaciers"
+      "rejoinName": "La Ville des Glaciers",
+      "color": "#8667a8"
     },
     {
       "id": "tete-bernarda",
       "file": "gpx/variantes/tete-bernarda.gpx",
-      "name": "Variante du Mont de la Saxe et de la Tête Bernarda",
+      "name": "Tête Bernarda",
       "description": "Parcours de crête au-dessus de Courmayeur et du Val Ferret, entre le refuge Bertone et le refuge Bonatti, par le Mont de la Saxe, la Tête Bernarda, le Col Sapin et le Pas entre deux Sauts. Plus exigeant que le sentier en balcon ; aucun service entre les deux refuges ; à réserver au beau temps.",
       "source": {
         "label": "OpenStreetMap — relation 9678375 ; altitudes OpenRouteService/SRTM",
@@ -91,12 +93,13 @@
       ],
       "difficulty": "SAC T2",
       "departureName": "Rifugio Bertone",
-      "rejoinName": "Rifugio Bonatti"
+      "rejoinName": "Rifugio Bonatti",
+      "color": "#519e93"
     },
     {
       "id": "fenetre-d-arpette",
       "file": "gpx/variantes/fenetre-d-arpette.gpx",
-      "name": "Variante de la Fenêtre d'Arpette",
+      "name": "Fenêtre d’Arpette",
       "description": "Alternative haute à l'itinéraire de l'Alp Bovine entre Champex-Lac et Trient, par la Fenêtre d'Arpette (2 665 m). Montée finale très raide dans les blocs ; déconseillée par temps instable.",
       "source": {
         "label": "OpenStreetMap — relation 9678380 ; altitudes OpenRouteService/SRTM",
@@ -114,7 +117,8 @@
       ],
       "difficulty": "SAC T4 · partiel",
       "departureName": "Champex-Lac",
-      "rejoinName": null
+      "rejoinName": null,
+      "color": "#5385b9"
     },
     {
       "id": "les-grands",
@@ -137,12 +141,13 @@
       ],
       "difficulty": "SAC T2",
       "departureName": null,
-      "rejoinName": "Col de Balme"
+      "rejoinName": "Col de Balme",
+      "color": "#b86379"
     },
     {
       "id": "le-tour",
       "file": "gpx/variantes/le-tour.gpx",
-      "name": "Variante du Tour",
+      "name": "Le Tour",
       "description": null,
       "source": {
         "label": "OpenStreetMap — relation 9678501 ; altitude OpenRouteService / SRTM",
@@ -155,12 +160,13 @@
       "references": [],
       "difficulty": "SAC T2 · partiel",
       "departureName": null,
-      "rejoinName": null
+      "rejoinName": null,
+      "color": "#a9963d"
     },
     {
       "id": "vallorcine",
       "file": "gpx/variantes/vallorcine.gpx",
-      "name": "Variante de Vallorcine",
+      "name": "Vallorcine",
       "description": null,
       "source": {
         "label": "OpenStreetMap — relation 9678726 ; altitude OpenRouteService / SRTM",
@@ -178,7 +184,8 @@
       ],
       "difficulty": "SAC T2 · partiel",
       "departureName": null,
-      "rejoinName": null
+      "rejoinName": null,
+      "color": "#687caa"
     }
   ]
 }

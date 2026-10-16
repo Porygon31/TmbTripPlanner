@@ -1,6 +1,6 @@
 import L from 'leaflet';
 import { useMemo } from 'react';
-import { MapContainer, ScaleControl, ZoomControl } from 'react-leaflet';
+import { MapContainer, ZoomControl } from 'react-leaflet';
 import { MASSIF_CENTER, MASSIF_ZOOM } from '../../services/map/basemaps';
 import { useApp } from '../../state/store';
 import { MapControls } from './MapControls';
@@ -38,8 +38,7 @@ export function MapView() {
       <FitBoundsHandler />
       <ResizeHandler />
       <DebugHandle />
-      <ZoomControl position="bottomright" zoomInTitle="Zoomer" zoomOutTitle="Dézoomer" />
-      <ScaleControl position="bottomleft" imperial={false} />
+      <ZoomControl position="topleft" zoomInTitle="Zoomer" zoomOutTitle="Dézoomer" />
       <MapControls />
     </MapContainer>
   );

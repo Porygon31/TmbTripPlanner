@@ -10,7 +10,7 @@ interface Props {
   color: string;
 }
 
-const AXIS = '#57534e';
+const AXIS = '#83968c';
 const GRID = 'rgba(28,25,23,0.08)';
 
 function hexToRgba(hex: string, alpha: number): string {
@@ -54,18 +54,18 @@ export function ElevationProfile({ target, geometry, color }: Props) {
       axes: [
         {
           stroke: AXIS,
-          grid: { stroke: GRID, width: 1 },
+          grid: { show: false },
           ticks: { show: false },
           values: (_u, vals) => vals.map((v) => `${count(v)} km`),
-          font: '11px system-ui, sans-serif',
+          font: '9px Arial, sans-serif',
         },
         {
           stroke: AXIS,
-          grid: { stroke: GRID, width: 1 },
+          grid: { stroke: GRID, width: 1, dash: [4, 5] },
           ticks: { show: false },
           size: 58,
           values: (_u, vals) => vals.map((v) => `${count(v)} m`),
-          font: '11px system-ui, sans-serif',
+          font: '9px Arial, sans-serif',
         },
       ],
       series: [
@@ -73,8 +73,7 @@ export function ElevationProfile({ target, geometry, color }: Props) {
         {
           label: 'Altitude',
           stroke: color,
-          width: 2,
-          fill: hexToRgba(color, 0.14),
+          width: 1.5,
           points: { show: false },
           spanGaps: false,
         },

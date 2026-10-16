@@ -10,11 +10,12 @@ export function startAutosave(delay = 1000): () => void {
   const save = () => {
     timer = null;
     const s = useApp.getState();
+    if (s.tutorialActive) return;
     const imports = s.imports.map((i) => s.tracks[i.id]).filter(Boolean);
     void projectStore.saveCurrent(makeProject(s.history.present, imports));
   };
   const unsub = useApp.subscribe((s, prev) => {
-    if (!s.restored) return;
+    if (!s.restored || s.tutorialActive) return;
     if (s.history.present === prev.history.present && s.imports === prev.imports) return;
     if (timer) clearTimeout(timer);
     timer = setTimeout(save, delay);

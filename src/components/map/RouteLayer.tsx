@@ -11,7 +11,7 @@ import { effectiveTarget } from '../../state/selectors';
 import { ROUTE_TARGET, useApp } from '../../state/store';
 import { displayLine } from './displayCache';
 
-export const ROUTE_COLOR = '#2563eb';
+export const ROUTE_COLOR = '#ed693d';
 const ERROR_COLOR = '#b91c1c';
 
 const iconCache = new Map<string, L.DivIcon>();
@@ -39,7 +39,7 @@ function segmentStyle(seg: RouteSegment): L.PathOptions {
   if (seg.status === 'pending') return { color: ROUTE_COLOR, weight: 4, dashArray: '4 8', opacity: 0.55 };
   if (seg.mode === 'straight') return { color: ROUTE_COLOR, weight: 4, dashArray: '8 8', opacity: 0.9 };
   // dashArray explicite : Leaflet conserve sinon le pointillé de l'état « en calcul ».
-  return { color: ROUTE_COLOR, weight: 5, opacity: 0.95, lineCap: 'round', lineJoin: 'round', dashArray: undefined };
+  return { color: ROUTE_COLOR, weight: 4, opacity: 0.95, lineCap: 'round', lineJoin: 'round', dashArray: undefined };
 }
 
 const SegmentLine = memo(function SegmentLine({ seg, index, from, to }: { seg: RouteSegment; index: number; from: Waypoint; to: Waypoint }) {
@@ -76,7 +76,7 @@ const SegmentLine = memo(function SegmentLine({ seg, index, from, to }: { seg: R
   );
   return (
     <>
-      <Polyline positions={positions} pathOptions={{ color: '#ffffff', weight: 9, opacity: seg.status === 'ok' ? 0.85 : 0.4 }} interactive={false} />
+      <Polyline positions={positions} pathOptions={{ color: '#ffffff', weight: 6, opacity: seg.status === 'ok' ? 0.7 : 0.4 }} interactive={false} />
       <Polyline positions={positions} pathOptions={segmentStyle(seg)} eventHandlers={handlers}>
         {seg.status === 'error' && (
           <Tooltip sticky direction="top">

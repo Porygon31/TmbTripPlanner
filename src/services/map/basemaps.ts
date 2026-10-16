@@ -82,7 +82,7 @@ export const OVERLAYS: TileSource[] = [
   },
 ];
 
-export const DEFAULT_BASEMAP = 'topo';
+export const DEFAULT_BASEMAP = 'osm';
 
 /** Centre du massif du Mont-Blanc et zoom initial. */
 export const MASSIF_CENTER: [number, number] = [45.85, 6.95];

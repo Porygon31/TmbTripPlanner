@@ -63,8 +63,7 @@ function LayersMenu({ onClose }: { onClose: () => void }) {
 export function MapControls() {
   const map = useMap();
   const mode = useApp((s) => s.mode);
-  const canUndo = useApp((s) => s.history.past.length > 0);
-  const canRedo = useApp((s) => s.history.future.length > 0);
+  const basemap = useApp((s) => s.basemap);
   const [menu, setMenu] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const topLeft = useIsolated<HTMLDivElement>();
@@ -98,30 +97,21 @@ export function MapControls() {
   const s = useApp.getState();
   return (
     <>
-      <div className="map-controls top-left" ref={topLeft}>
+      <div className="map-caption"><span className="live-dot" /> <b>Massif du Mont-Blanc</b><span>45°50′ N · 6°52′ E</span></div>
+      <div className="map-mode-bar" ref={topLeft} data-tour="map">
+        <button className={mode === 'view' ? 'active' : ''} onClick={() => s.setMode('view')}><Icon name="cursor" size={14} /> Explorer</button>
         <button
           type="button"
-          className={`btn btn-map ${mode === 'edit' ? 'btn-active' : 'btn-primary'}`}
+          className={mode === 'edit' ? 'active' : ''}
           onClick={() => s.setMode(mode === 'edit' ? 'view' : 'edit')}
           data-testid="toggle-edit"
         >
-          <Icon name={mode === 'edit' ? 'check' : 'pencil'} />
-          {mode === 'edit' ? 'Terminer' : 'Créer mon itinéraire'}
+          <Icon name="pin" size={14} /> Tracer
         </button>
-        {mode === 'edit' && (
-          <div className="btn-group">
-            <button type="button" className="btn btn-map icon-only" onClick={() => s.undo()} disabled={!canUndo} title="Annuler (Ctrl+Z)" aria-label="Annuler">
-              <Icon name="undo" />
-            </button>
-            <button type="button" className="btn btn-map icon-only" onClick={() => s.redo()} disabled={!canRedo} title="Rétablir (Ctrl+Y)" aria-label="Rétablir">
-              <Icon name="redo" />
-            </button>
-          </div>
-        )}
       </div>
-      <div className="map-controls top-right" ref={topRight}>
-        <button type="button" className="btn btn-map icon-only" onClick={() => setMenu((m) => !m)} aria-label="Fonds de carte et calques" title="Fonds de carte et calques" data-testid="layers-button">
-          <Icon name="layers" />
+      <div className="map-controls top-right" ref={topRight} data-tour="map-tools">
+        <button type="button" className="btn btn-map" onClick={() => setMenu((m) => !m)} aria-label="Fonds de carte et calques" title="Fonds de carte et calques" data-testid="layers-button" aria-expanded={menu}>
+          <Icon name="map" size={16} /> {BASEMAPS.find((b) => b.id === basemap)?.label}<Icon name="down" size={13} />
         </button>
         {fsSupported && (
           <button
@@ -139,6 +129,7 @@ export function MapControls() {
         </button>
         {menu && <LayersMenu onClose={() => setMenu(false)} />}
       </div>
+      <div className="map-key"><span><i className="key-classic" /> TMB classique</span><span><i className="key-route" /> Votre parcours</span></div>
       {mode === 'edit' && (
         <div className="edit-hint" role="status">
           <span className="hint-long">Touchez la carte pour ajouter un point · glissez un point pour le déplacer · touchez le tracé pour insérer un point</span>

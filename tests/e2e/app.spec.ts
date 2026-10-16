@@ -37,6 +37,7 @@ test.describe('Carte et catalogue', () => {
     await page.getByTestId('tab-variants').click();
     const card = page.getByTestId('main-card');
     await expect(card).toContainText('FIXTURE boucle principale');
+    await card.locator('.track-details summary').click();
     await expect(card.locator('[data-stat="distance"] dd')).toHaveText('76,4 km');
     await page.screenshot({ path: `${SHOTS}/desktop-accueil.png` });
   });
@@ -46,6 +47,8 @@ test.describe('Carte et catalogue', () => {
     await page.route(/tile\.opentopomap\.org/, (route) => route.fulfill({ status: 503, body: 'indisponible' }));
     await page.goto('/');
     await page.getByTestId('disclaimer-accept').click();
+    await page.getByTestId('layers-button').click();
+    await page.getByRole('radio', { name: 'Topographique', exact: true }).check();
     await expect.poll(() => page.evaluate(() => window.__tmb?.store.getState().basemap)).toBe('osm');
     await expect(page.locator('.toast')).toContainText('indisponible');
     await expect.poll(() => page.locator('.leaflet-tile-loaded').count()).toBeGreaterThan(0);
@@ -78,7 +81,7 @@ test.describe('Carte et catalogue', () => {
     const sud = page.getByTestId('variant-fixture-col-sud');
     await nord.getByTestId('show-fixture-col-nord').click();
     await sud.getByTestId('show-fixture-col-sud').click();
-    await expect(nord.getByTestId('show-fixture-col-nord')).toHaveText(/Affichée/);
+    await expect(nord.getByTestId('show-fixture-col-nord')).toHaveText(/Masquer/);
     await page.waitForFunction(() => {
       const t = window.__tmb.store.getState().tracks;
       return !!t['fixture-col-nord'] && !!t['fixture-col-sud'];
@@ -109,7 +112,7 @@ test.describe('Créateur d’itinéraire', () => {
       let n = 0;
       window.__tmb.map.eachLayer((l) => {
         const o = (l as unknown as { options?: { color?: string; weight?: number; dashArray?: unknown } }).options;
-        if (o?.color === '#2563eb' && o.weight === 5 && o.dashArray) n++;
+        if (o?.color === '#ed693d' && o.weight === 4 && o.dashArray) n++;
       });
       return n;
     });
@@ -201,12 +204,12 @@ test.describe('Créateur d’itinéraire', () => {
 test.describe('TMB personnalisé', () => {
   test('partir du TMB, greffer deux variantes, sans trou', async ({ page }) => {
     await openApp(page);
-    await page.getByTestId('start-from-main').click();
+    await page.getByTestId('classic-start').click();
     await page.getByTestId('tab-variants').click();
     await page.getByTestId('add-fixture-col-nord').click();
     await page.getByTestId('add-fixture-col-sud').click();
-    await expect(page.getByTestId('variant-fixture-col-nord')).toContainText('Dans mon itinéraire');
-    await expect(page.getByTestId('variant-fixture-col-sud')).toContainText('Dans mon itinéraire');
+    await expect(page.getByTestId('variant-fixture-col-nord')).toContainText('Intégrée');
+    await expect(page.getByTestId('variant-fixture-col-sud')).toContainText('Intégrée');
     const info = await routeInfo(page);
     expect(info.segments.filter((s) => s.trackId === 'fixture-col-nord')).toHaveLength(1);
     expect(info.segments.filter((s) => s.trackId === 'fixture-col-sud')).toHaveLength(1);
@@ -214,7 +217,7 @@ test.describe('TMB personnalisé', () => {
     expect(await junctionGap(page)).toBeLessThan(1);
     expect(await maxGap(page)).toBeLessThan(120);
     // Retirer une variante restaure le tronçon classique.
-    await page.getByTestId('variant-fixture-col-nord').getByRole('button', { name: 'Retirer de mon itinéraire' }).click();
+    await page.getByTestId('variant-fixture-col-nord').getByRole('button', { name: 'Intégrée' }).click();
     const after = await routeInfo(page);
     expect(after.segments.some((s) => s.trackId === 'fixture-col-nord')).toBe(false);
     await page.screenshot({ path: `${SHOTS}/desktop-tmb-personnalise.png` });
@@ -251,7 +254,7 @@ test.describe('Import et export GPX', () => {
     await openApp(page);
     await createRoute(page, [A, B, C, D]);
     await page.getByRole('button', { name: 'Marquer comme fin d’étape' }).first().click();
-    const [download] = await Promise.all([page.waitForEvent('download'), page.getByTestId('export-gpx').click()]);
+    const [download] = await Promise.all([page.waitForEvent('download'), page.getByTestId('header-export').click()]);
     expect(download.suggestedFilename()).toBe('mon-itineraire.gpx');
     const file = 'test-results/export.gpx';
     await download.saveAs(file);

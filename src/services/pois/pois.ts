@@ -1,6 +1,6 @@
 import { get, set } from 'idb-keyval';
 
-export type PoiKind = 'hut' | 'pass' | 'peak' | 'village' | 'hamlet';
+export type PoiKind = 'hut' | 'hotel' | 'pass' | 'peak' | 'village' | 'hamlet' | 'viewpoint';
 
 export interface Poi {
   id: string;
@@ -9,6 +9,8 @@ export interface Poi {
   lat: number;
   lon: number;
   ele: number | null;
+  website?: string;
+  url?: string;
 }
 
 /** Fournisseur de points d'intérêt (remplaçable : fichier statique, Overpass, autre API…). */
@@ -20,7 +22,7 @@ export interface PoiProvider {
 /** Emprise du massif (sud, ouest, nord, est), couvrant le TMB et ses variantes. */
 export const MASSIF_BBOX: [number, number, number, number] = [45.66, 6.6, 46.12, 7.2];
 
-const CACHE_KEY = 'pois:v1';
+const CACHE_KEY = 'pois:v2';
 let lastLoaded: Poi[] = [];
 
 /**
@@ -44,6 +46,8 @@ export function nearestPoi(p: { lat: number; lon: number }, maxDistance = 500, k
 const CACHE_TTL = 30 * 24 * 3600 * 1000;
 
 function kindOf(tags: Record<string, string>): PoiKind | null {
+  if (tags.tourism === 'hotel') return 'hotel';
+  if (tags.tourism === 'viewpoint') return 'viewpoint';
   if (tags.tourism === 'alpine_hut' || tags.tourism === 'wilderness_hut') return 'hut';
   if (tags.mountain_pass === 'yes' || tags.natural === 'saddle') return 'pass';
   if (tags.natural === 'peak') return 'peak';
@@ -75,7 +79,7 @@ export function createOverpassPoiProvider(endpoint = 'https://overpass-api.de/ap
       const [s, w, n, e] = MASSIF_BBOX;
       const bb = `(${s},${w},${n},${e})`;
       const query = `[out:json][timeout:30];(
-        nwr["tourism"~"^(alpine_hut|wilderness_hut)$"]${bb};
+        nwr["tourism"~"^(alpine_hut|wilderness_hut|hotel|viewpoint)$"]${bb};
         node["mountain_pass"="yes"]["name"]${bb};
         node["natural"="saddle"]["name"]${bb};
         node["natural"="peak"]["name"]["ele"]${bb};
@@ -94,7 +98,7 @@ export function createOverpassPoiProvider(endpoint = 'https://overpass-api.de/ap
         const lon = el.lon ?? el.center?.lon;
         const name = tags['name:fr'] ?? tags.name;
         if (!kind || lat === undefined || lon === undefined || !name) continue;
-        pois.push({ id: `${el.type}/${el.id}`, name, kind, lat, lon, ele: parseEle(tags.ele) });
+        pois.push({ id: `${el.type}/${el.id}`, name, kind, lat, lon, ele: parseEle(tags.ele), website: tags.website ?? tags['contact:website'], url: `https://www.openstreetmap.org/${el.type}/${el.id}` });
       }
       try {
         await set(CACHE_KEY, { at: Date.now(), pois });
@@ -129,6 +133,8 @@ export function createPoiProvider(baseUrl: string): PoiProvider {
 
 export const POI_LABELS: Record<PoiKind, string> = {
   hut: 'Refuge',
+  hotel: 'Hôtel',
+  viewpoint: 'Point de vue',
   pass: 'Col',
   peak: 'Sommet',
   village: 'Village',
