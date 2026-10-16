@@ -1,6 +1,6 @@
 # TMB Trip Planner
 
-Outil web de préparation d'un **Tour du Mont-Blanc personnalisé**. On part du tracé officiel, on affiche et on combine les variantes réelles, on crée ou on modifie son propre parcours sur une carte topographique en suivant les sentiers, puis on exporte le résultat en **GPX 1.1**.
+Outil web de préparation d'un **Tour du Mont-Blanc personnalisé**. On part du tracé de référence OpenStreetMap, on affiche et on combine les variantes réelles, on crée ou on modifie son propre parcours sur une carte topographique en suivant les sentiers, puis on exporte le résultat en **GPX 1.1**.
 
 **Site en ligne : https://porygon31.github.io/TmbTripPlanner/** (mis à jour automatiquement à chaque push sur la branche par défaut, une fois les tests passés).
 
@@ -35,22 +35,19 @@ npm run preview      # sert dist/ sur http://localhost:4173
 
 `npm run dev` et `npm run build` régénèrent d'abord le catalogue (`public/data/`) à partir de `data/`.
 
-### Données GPX (à fournir)
+### Données GPX incluses
 
-Le dépôt **ne contient pas** de tracé réel : il faut déposer les GPX dans `data/gpx/`. La procédure, les noms de fichiers attendus, les champs de `data/catalog.config.json` et la source recommandée (OpenStreetMap, super-relation [124456](https://www.openstreetmap.org/relation/124456), licence ODbL) sont décrits dans **[data/README.md](data/README.md)**.
+Le dépôt contient le **TMB classique et ses sept variantes** dans `data/gpx/` : Col de Tricot, Col des Fours, Tête Bernarda, Fenêtre d’Arpette, Les Grands, Le Tour et Vallorcine. Le TMB commence aux Houches et tourne dans le sens antihoraire.
 
-Option pratique, sur une machine avec Internet :
+Les géométries proviennent d’OpenStreetMap via Waymarked Trails, sous licence ODbL. Les altitudes proviennent du modèle de terrain OpenRouteService/SRTM. Les raccords pédestres du Col de Tricot, de la Fenêtre d’Arpette et du Tour sont identifiés séparément dans les GPX. Sources, versions OSM, dates et empreintes SHA-256 sont conservées dans [data/provenance.json](data/provenance.json).
 
-```bash
-npm run fetch:osm    # télécharge le TMB et ses 7 variantes depuis OSM, avec altitude
-npm run build:data   # régénère le catalogue
-```
+Aucune clé ni requête d’altimétrie n’est nécessaire pour construire ce catalogue. Les données complètes restent dans les GPX ; seul le calcul du dénivelé applique un rééchantillonnage tous les 25 m, une médiane sur cinq échantillons et un seuil de 5 m pour limiter le bruit du modèle de terrain. Les portions sans altitude sont calculées séparément.
 
-Tant que `data/` est vide, l'application fonctionne quand même (création, import, export) et explique comment ajouter les traces.
+Voir [data/README.md](data/README.md) pour ajouter ou mettre à jour une trace. Le script optionnel `npm run fetch:osm` remplace les fichiers locaux à partir d’OSM et requiert Internet : vérifier ses résultats avant de publier une mise à jour.
 
 ## Déploiement
 
-L'application est **100 % statique**. `npm run build` produit `dist/`, à publier tel quel sur n'importe quel hébergeur (GitHub Pages, Netlify, Vercel, Cloudflare Pages, serveur nginx…). La configuration `base: './'` permet de la servir aussi depuis un sous-dossier. À chaque push, la CI publie ce dossier en artefact `tmb-trip-planner-dist` et, sur la branche par défaut, le met en ligne sur GitHub Pages (job `deploy`).
+L'application est **100 % statique**. `npm run build` produit `dist/`, à publier tel quel sur n'importe quel hébergeur (GitHub Pages, Netlify, Vercel, Cloudflare Pages, serveur nginx…). La configuration `base: './'` permet de la servir aussi depuis un sous-dossier. À chaque push, la CI publie ce dossier en artefact `tmb-trip-planner-dist` et, sur la branche par défaut `main`, le met en ligne sur GitHub Pages (job `deploy`).
 
 ## Architecture
 

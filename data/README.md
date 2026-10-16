@@ -1,8 +1,17 @@
 # Données GPX du catalogue
 
-Ce dossier contient **les traces réelles** utilisées par l'application : le tracé de référence du Tour du Mont-Blanc et ses variantes. Elles ne sont pas fournies d'office : c'est à toi de les déposer ici, depuis une source publique dont la licence autorise la réutilisation.
+Ce dossier contient **les traces réelles** utilisées par l'application : le tracé de référence du Tour du Mont-Blanc et ses variantes. Le TMB et ses sept variantes sont inclus, prêts à être utilisés sans télécharger de données pendant le build.
 
 À chaque `npm run dev` ou `npm run build`, le script `scripts/build-catalog.ts` lit ce dossier et produit `public/data/` : le catalogue, les points et une copie des GPX. Ce dossier `public/data/` est généré et n'est pas versionné.
+
+## Données livrées et provenance
+
+- TMB, Tricot, Fours, Tête Bernarda, Arpette et Grands : exports Waymarked Trails du 8 octobre 2026, enrichis avec les altitudes du modèle de terrain OpenRouteService/SRTM.
+- Le Tour (relation 9678501) et Vallorcine (9678726) : géométries récupérées le 16 octobre 2026 depuis l’API actuelle de Waymarked Trails, transformées de Web Mercator en WGS84 et enrichies par le même service d’altimétrie. La génération GPX de Waymarked Trails se fait désormais dans le navigateur ; ces deux fichiers ont été générés localement depuis ses géométries ordonnées.
+- [provenance.json](provenance.json) conserve les versions OSM, dates, empreintes des fichiers d’origine et des GPX livrés, transformations et sources par portion. Les fichiers d’origine et métadonnées sont dans `sources/`.
+- Le tracé principal est une boucle orientée dans le sens antihoraire depuis Les Houches. Ses trois parties jointives d’origine sont fusionnées sans ajouter de géométrie. Les raccords pédestres déjà calculés avec OpenRouteService (Tricot, Arpette et Le Tour) forment des traces nommées distinctes dans leurs GPX ; leurs jonctions sont communes, sans trou.
+- Les cotations SAC proviennent des chemins OSM et sont marquées « partiel » quand elles ne couvrent pas tous les chemins. Les descriptions du Tour et de Vallorcine restent non renseignées.
+- Les altitudes sont des valeurs de modèle de terrain, pas des mesures sur le sentier. Les longs intervalles entre points sont signalés sans être assimilés à une rupture GPX. Aucune certification institutionnelle n’est revendiquée.
 
 ## Où déposer les fichiers
 
@@ -48,7 +57,7 @@ Pour télécharger le GPX d'une relation, deux possibilités :
 | `id` | Identifiant stable (par défaut : nom du fichier). |
 | `name` | Nom affiché (par défaut : `<name>` du GPX). |
 | `description` | Courte description. `null` s'affiche « non renseignée ». |
-| `source` | Origine du **fichier GPX** : `{ "label", "url", "license", "licenseUrl", "retrieved" }`. **À remplir** avec la vraie source de ton fichier. |
+| `source` | Origine du **fichier GPX** : `{ "label", "url", "license", "licenseUrl", "retrieved" }`. À maintenir avec la vraie source de ton fichier. |
 | `references` | Pages consultées pour la description (liens « En savoir plus »). |
 | `difficulty` | Cotation issue d'une source (ex. `"T3"`, `"Difficile"`). Si `null`, la difficulté est **estimée automatiquement** à partir de l'altitude max, de la pente max sur 200 m et du D+, et elle est affichée comme telle. |
 | `departureName`, `rejoinName` | Noms des points de départ et de jonction avec le TMB. Les positions, elles, sont toujours calculées à partir des traces. |
@@ -72,5 +81,7 @@ Exemple de `source` pour une relation OSM :
 
 - Il oriente le tracé principal dans le sens demandé et oriente chaque variante dans le même sens.
 - Il calcule, pour chaque variante, le point de départ et le point de jonction sur le TMB (en km), l'écart de distance et de D+ par rapport au tronçon classique, et indique si la variante peut être greffée automatiquement (extrémités à moins de 300 m du tracé).
-- Il signale les trous de plus de 100 m et les altitudes manquantes.
+- Il signale les intervalles entre points de plus de 100 m et les altitudes manquantes. Un long intervalle n’est pas à lui seul la preuve d’un trou.
 - Il **n'invente rien** : un champ absent reste vide.
+
+Pour toute mise à jour, actualiser les sources, versions et empreintes dans `provenance.json`, puis exécuter `npm test` et `npm run build`. Le test du catalogue contrôle les empreintes, la fermeture du tour, les raccordements et l’export/réimport.

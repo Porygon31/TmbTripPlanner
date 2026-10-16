@@ -1,15 +1,32 @@
 {
   "main": {
     "file": "gpx/tmb-principal.gpx",
-    "name": "Tour du Mont-Blanc — itinéraire principal",
+    "name": "TMB classique — données OpenStreetMap",
     "description": "Boucle d'environ 170 km autour du massif du Mont-Blanc, à travers la France, l'Italie et la Suisse, traditionnellement parcourue dans le sens antihoraire au départ des Houches.",
-    "source": null,
+    "source": {
+      "label": "OpenStreetMap — relation 9678362 ; altitudes OpenRouteService/SRTM",
+      "url": "https://hiking.waymarkedtrails.org/#route?id=9678362",
+      "license": "ODbL 1.0",
+      "licenseUrl": "https://www.openstreetmap.org/copyright",
+      "retrieved": "2026-10-08",
+      "notes": "Relation OSM 9678362, version 156. Altitudes issues du modèle de terrain OpenRouteService/SRTM, sans mesure de terrain."
+    },
     "references": [
-      { "label": "Wikipédia — Tour du Mont-Blanc", "url": "https://fr.wikipedia.org/wiki/Tour_du_Mont-Blanc" },
-      { "label": "OpenStreetMap — super-relation 124456 (TMB)", "url": "https://www.openstreetmap.org/relation/124456" }
+      {
+        "label": "Wikipédia — Tour du Mont-Blanc",
+        "url": "https://fr.wikipedia.org/wiki/Tour_du_Mont-Blanc"
+      },
+      {
+        "label": "OpenStreetMap — super-relation 124456 (TMB)",
+        "url": "https://www.openstreetmap.org/relation/124456"
+      }
     ],
     "direction": "counterclockwise",
-    "startNear": null
+    "startNear": {
+      "name": "Les Houches",
+      "lat": 45.8905554,
+      "lon": 6.7986045
+    }
   },
   "variants": [
     {
@@ -17,9 +34,16 @@
       "file": "gpx/variantes/col-de-tricot.gpx",
       "name": "Variante du Col de Tricot",
       "description": "Quitte l'itinéraire classique pour franchir le Col de Tricot, au plus près du glacier de Bionnassay, puis descend très raide vers les chalets de Miage avant de rejoindre Le Truc.",
-      "source": null,
+      "source": {
+        "label": "OpenStreetMap — relation 9678267 ; altitudes OpenRouteService/SRTM",
+        "url": "https://hiking.waymarkedtrails.org/#route?id=9678267",
+        "license": "ODbL 1.0",
+        "licenseUrl": "https://www.openstreetmap.org/copyright",
+        "retrieved": "2026-10-08",
+        "notes": "Relation OSM 9678267, version 16. Altitudes issues du modèle de terrain OpenRouteService/SRTM, sans mesure de terrain. Raccord pédestre OpenRouteService inclus et identifié dans le GPX et data/provenance.json."
+      },
       "references": [],
-      "difficulty": null,
+      "difficulty": "SAC T2 · partiel",
       "departureName": null,
       "rejoinName": null
     },
@@ -28,9 +52,21 @@
       "file": "gpx/variantes/col-des-fours.gpx",
       "name": "Variante du Col des Fours",
       "description": "Évite le détour par Les Chapieux en passant par le Col des Fours, entre le refuge de la Croix du Bonhomme et La Ville des Glaciers. Descente raide sur schistes, névés fréquents en début de saison : par beau temps uniquement.",
-      "source": null,
-      "references": [{ "label": "Moon & Honey Travel — TMB étape 4", "url": "https://www.moonhoneytravel.com/tour-du-mont-blanc-stage-4/" }],
-      "difficulty": null,
+      "source": {
+        "label": "OpenStreetMap — relation 9678296 ; altitudes OpenRouteService/SRTM",
+        "url": "https://hiking.waymarkedtrails.org/#route?id=9678296",
+        "license": "ODbL 1.0",
+        "licenseUrl": "https://www.openstreetmap.org/copyright",
+        "retrieved": "2026-10-08",
+        "notes": "Relation OSM 9678296, version 2. Altitudes issues du modèle de terrain OpenRouteService/SRTM, sans mesure de terrain."
+      },
+      "references": [
+        {
+          "label": "Moon & Honey Travel — TMB étape 4",
+          "url": "https://www.moonhoneytravel.com/tour-du-mont-blanc-stage-4/"
+        }
+      ],
+      "difficulty": "SAC T2",
       "departureName": "Refuge de la Croix du Bonhomme",
       "rejoinName": "La Ville des Glaciers"
     },
@@ -39,9 +75,21 @@
       "file": "gpx/variantes/tete-bernarda.gpx",
       "name": "Variante du Mont de la Saxe et de la Tête Bernarda",
       "description": "Parcours de crête au-dessus de Courmayeur et du Val Ferret, entre le refuge Bertone et le refuge Bonatti, par le Mont de la Saxe, la Tête Bernarda, le Col Sapin et le Pas entre deux Sauts. Plus exigeant que le sentier en balcon ; aucun service entre les deux refuges ; à réserver au beau temps.",
-      "source": null,
-      "references": [{ "label": "Saint-Bernard — n° 26 Tour du Mont-Blanc", "url": "https://www.saint-bernard.ch/en/activities/no-26-tour-du-mont-blanc-2746/" }],
-      "difficulty": null,
+      "source": {
+        "label": "OpenStreetMap — relation 9678375 ; altitudes OpenRouteService/SRTM",
+        "url": "https://hiking.waymarkedtrails.org/#route?id=9678375",
+        "license": "ODbL 1.0",
+        "licenseUrl": "https://www.openstreetmap.org/copyright",
+        "retrieved": "2026-10-08",
+        "notes": "Relation OSM 9678375, version 8. Altitudes issues du modèle de terrain OpenRouteService/SRTM, sans mesure de terrain."
+      },
+      "references": [
+        {
+          "label": "Saint-Bernard — n° 26 Tour du Mont-Blanc",
+          "url": "https://www.saint-bernard.ch/en/activities/no-26-tour-du-mont-blanc-2746/"
+        }
+      ],
+      "difficulty": "SAC T2",
       "departureName": "Rifugio Bertone",
       "rejoinName": "Rifugio Bonatti"
     },
@@ -50,9 +98,21 @@
       "file": "gpx/variantes/fenetre-d-arpette.gpx",
       "name": "Variante de la Fenêtre d'Arpette",
       "description": "Alternative haute à l'itinéraire de l'Alp Bovine entre Champex-Lac et Trient, par la Fenêtre d'Arpette (2 665 m). Montée finale très raide dans les blocs ; déconseillée par temps instable.",
-      "source": null,
-      "references": [{ "label": "Moon & Honey Travel — TMB étape 8", "url": "https://www.moonhoneytravel.com/tour-du-mont-blanc-stage-8/" }],
-      "difficulty": null,
+      "source": {
+        "label": "OpenStreetMap — relation 9678380 ; altitudes OpenRouteService/SRTM",
+        "url": "https://hiking.waymarkedtrails.org/#route?id=9678380",
+        "license": "ODbL 1.0",
+        "licenseUrl": "https://www.openstreetmap.org/copyright",
+        "retrieved": "2026-10-08",
+        "notes": "Relation OSM 9678380, version 9. Altitudes issues du modèle de terrain OpenRouteService/SRTM, sans mesure de terrain. Raccord pédestre OpenRouteService inclus et identifié dans le GPX et data/provenance.json."
+      },
+      "references": [
+        {
+          "label": "Moon & Honey Travel — TMB étape 8",
+          "url": "https://www.moonhoneytravel.com/tour-du-mont-blanc-stage-8/"
+        }
+      ],
+      "difficulty": "SAC T4 · partiel",
       "departureName": "Champex-Lac",
       "rejoinName": null
     },
@@ -61,9 +121,21 @@
       "file": "gpx/variantes/les-grands.gpx",
       "name": "Variante des Grands",
       "description": "Entre Trient et le Col de Balme par le Chalet du Glacier et le refuge Les Grands, sous le glacier des Grands. Passage équipé d'un câble sur la partie la plus exposée.",
-      "source": null,
-      "references": [{ "label": "Walking Switzerland — walk 8105", "url": "https://www.walkingswitzerland.com/swiss-walk-8105" }],
-      "difficulty": null,
+      "source": {
+        "label": "OpenStreetMap — relation 9678437 ; altitudes OpenRouteService/SRTM",
+        "url": "https://hiking.waymarkedtrails.org/#route?id=9678437",
+        "license": "ODbL 1.0",
+        "licenseUrl": "https://www.openstreetmap.org/copyright",
+        "retrieved": "2026-10-08",
+        "notes": "Relation OSM 9678437, version 12. Altitudes issues du modèle de terrain OpenRouteService/SRTM, sans mesure de terrain."
+      },
+      "references": [
+        {
+          "label": "Walking Switzerland — walk 8105",
+          "url": "https://www.walkingswitzerland.com/swiss-walk-8105"
+        }
+      ],
+      "difficulty": "SAC T2",
       "departureName": null,
       "rejoinName": "Col de Balme"
     },
@@ -72,9 +144,16 @@
       "file": "gpx/variantes/le-tour.gpx",
       "name": "Variante du Tour",
       "description": null,
-      "source": null,
+      "source": {
+        "label": "OpenStreetMap — relation 9678501 ; altitude OpenRouteService / SRTM",
+        "url": "https://hiking.waymarkedtrails.org/#route?id=9678501",
+        "license": "ODbL 1.0",
+        "licenseUrl": "https://www.openstreetmap.org/copyright",
+        "retrieved": "2026-10-16",
+        "notes": "Géométrie OpenStreetMap via l’API Waymarked Trails, convertie de Web Mercator en WGS84. Relation 9678501, version 16. Altitudes issues du modèle de terrain OpenRouteService / SRTM. Raccord pédestre OpenRouteService inclus depuis le tracé classique, identifié séparément dans le GPX."
+      },
       "references": [],
-      "difficulty": null,
+      "difficulty": "SAC T2 · partiel",
       "departureName": null,
       "rejoinName": null
     },
@@ -83,9 +162,21 @@
       "file": "gpx/variantes/vallorcine.gpx",
       "name": "Variante de Vallorcine",
       "description": null,
-      "source": null,
-      "references": [{ "label": "OpenStreetMap — relation 9678726", "url": "https://www.openstreetmap.org/relation/9678726" }],
-      "difficulty": null,
+      "source": {
+        "label": "OpenStreetMap — relation 9678726 ; altitude OpenRouteService / SRTM",
+        "url": "https://hiking.waymarkedtrails.org/#route?id=9678726",
+        "license": "ODbL 1.0",
+        "licenseUrl": "https://www.openstreetmap.org/copyright",
+        "retrieved": "2026-10-16",
+        "notes": "Géométrie OpenStreetMap via l’API Waymarked Trails, convertie de Web Mercator en WGS84. Relation 9678726, version 16. Altitudes issues du modèle de terrain OpenRouteService / SRTM."
+      },
+      "references": [
+        {
+          "label": "OpenStreetMap — relation 9678726",
+          "url": "https://www.openstreetmap.org/relation/9678726"
+        }
+      ],
+      "difficulty": "SAC T2 · partiel",
       "departureName": null,
       "rejoinName": null
     }

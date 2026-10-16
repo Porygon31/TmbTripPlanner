@@ -43,8 +43,51 @@ export function ascentDescent(elevations: Iterable<number | null>, threshold = E
   return { ascent, descent };
 }
 
-function* eles(points: readonly RoutePoint[], from: number, to: number): Generator<number | null> {
-  for (let i = from; i <= to; i++) yield points[i].ele;
+/** Filtre le bruit du MNT à distance régulière, sans changer les points de la trace. */
+function filteredAscentDescent(points: readonly RoutePoint[], cum: Float64Array, from: number, to: number): AscentDescent {
+  let ascent = 0;
+  let descent = 0;
+  let samples: number[] = [];
+  let previous: number | null = null;
+  let previousDistance = 0;
+  let nextSample = 0;
+
+  const flush = () => {
+    if (previous !== null && samples[samples.length - 1] !== previous) samples.push(previous);
+    // Médiane sur cinq échantillons espacés de 25 m ; extrémités conservées.
+    const filtered = samples.map((ele, i) => {
+      if (i === 0 || i === samples.length - 1) return ele;
+      const window = samples.slice(Math.max(0, i - 2), i + 3).sort((a, b) => a - b);
+      return window[Math.floor(window.length / 2)];
+    });
+    const change = ascentDescent(filtered);
+    ascent += change.ascent;
+    descent += change.descent;
+    samples = [];
+    previous = null;
+  };
+
+  for (let i = from; i <= to; i++) {
+    const ele = points[i].ele;
+    if (ele === null || !Number.isFinite(ele)) {
+      flush();
+      continue;
+    }
+    if (previous === null) {
+      samples.push(ele);
+      nextSample = cum[i] + 25;
+    } else {
+      const length = cum[i] - previousDistance;
+      while (length > 0 && nextSample <= cum[i]) {
+        samples.push(previous + (ele - previous) * (nextSample - previousDistance) / length);
+        nextSample += 25;
+      }
+    }
+    previous = ele;
+    previousDistance = cum[i];
+  }
+  flush();
+  return { ascent, descent };
 }
 
 /**
@@ -79,7 +122,7 @@ export function computeStatistics(
     if (minEle === null || e < minEle) minEle = e;
     if (maxEle === null || e > maxEle) maxEle = e;
   }
-  const { ascent, descent } = ascentDescent(eles(points, from, to));
+  const { ascent, descent } = filteredAscentDescent(points, cum, from, to);
   const distance = cum[to] - cum[from];
   const count = to - from + 1;
   return {

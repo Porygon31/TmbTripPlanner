@@ -81,7 +81,7 @@ function gapWarnings(points: RoutePoint[]): string[] {
       max = Math.max(max, d);
     }
   }
-  return count > 0 ? [`${count} trou(s) de plus de ${GAP_WARNING} m dans la trace (max ${Math.round(max)} m).`] : [];
+  return count > 0 ? [`${count} intervalle(s) de plus de ${GAP_WARNING} m entre points (max ${Math.round(max)} m) : vérifier ces portions peu détaillées.`] : [];
 }
 
 function elevationWarnings(coverage: number): string[] {

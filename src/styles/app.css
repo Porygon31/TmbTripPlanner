@@ -1069,16 +1069,16 @@ button:focus-visible {
     border-right: 0;
     border-radius: 16px 16px 0 0;
     box-shadow: 0 -4px 20px rgb(0 0 0 / 0.18);
-    transition: transform 0.22s ease;
+    transition: height 0.22s ease;
     padding-bottom: env(safe-area-inset-bottom);
   }
 
   .sidebar.sheet-peek {
-    transform: translateY(calc(88dvh - 128px));
+    height: 128px;
   }
 
   .sidebar.sheet-half {
-    transform: translateY(calc(88dvh - 55dvh));
+    height: 55dvh;
   }
 
   .sidebar.sheet-full {

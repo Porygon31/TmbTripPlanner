@@ -1,0 +1,3 @@
+# Les empreintes du manifeste doivent être identiques sur Windows et Linux.
+data/gpx/** text eol=lf
+data/sources/** -text

@@ -1,0 +1,316 @@
+{
+  "preparedAt": "2026-10-16T14:40:16.777Z",
+  "license": "ODbL 1.0",
+  "licenseUrl": "https://www.openstreetmap.org/copyright",
+  "legacyCatalogSha256": "92d6d5c5f2f6e066bfba3ca8724d66ff5b9227cd5ea5f226c856b2550332cb92",
+  "tracks": [
+    {
+      "id": "tmb",
+      "file": "gpx/tmb-principal.gpx",
+      "sha256": "e512511535481f196ba8d012baeef92f6ec13c28dd5bb49ea9a1ebe75fe03a58",
+      "sourceFile": "sources/9678362.gpx",
+      "sourceSha256": "2ac4f09d108e3d7c4f4e11055fd9270ed447f4fd435506d796e0602fe70aed65",
+      "relationId": 9678362,
+      "version": 156,
+      "extractedAt": "2026-10-08T11:23:23.967Z",
+      "transformations": [
+        "Fusion des trois parties jointives sans interpolation",
+        "Sens antihoraire et départ aux Houches",
+        "Altitudes du modèle de terrain OpenRouteService/SRTM"
+      ],
+      "segments": [
+        {
+          "track": 1,
+          "firstPoint": 0,
+          "lastPoint": 17001,
+          "pointCount": 17002,
+          "source": {
+            "kind": "osm",
+            "label": "TMB classique — données OpenStreetMap",
+            "url": "https://hiking.waymarkedtrails.org/#route?id=9678362",
+            "relationId": 9678362,
+            "version": 156,
+            "extractedAt": "2026-10-08T11:23:23.967Z",
+            "license": "© OpenStreetMap contributors — ODbL 1.0",
+            "sha256": "2ac4f09d108e3d7c4f4e11055fd9270ed447f4fd435506d796e0602fe70aed65",
+            "elevation": "Modèle de terrain OpenRouteService / SRTM"
+          }
+        }
+      ]
+    },
+    {
+      "id": "col-de-tricot",
+      "file": "gpx/variantes/col-de-tricot.gpx",
+      "sha256": "533bacbca1b52ef04c54fe10c1243c1cf8f3b02b2902465b25483e5b82ed7f25",
+      "sourceFile": "sources/9678267.gpx",
+      "sourceSha256": "32ae60e6c035219355b7f5f4bfed4afd6d54753d74488001dcb5c21fbd0c0a15",
+      "relationId": 9678267,
+      "version": 16,
+      "extractedAt": "2026-10-08T11:23:23.967Z",
+      "transformations": [
+        "Orientation dans le sens antihoraire du TMB",
+        "Altitudes du modèle de terrain OpenRouteService/SRTM"
+      ],
+      "segments": [
+        {
+          "track": 1,
+          "firstPoint": 0,
+          "lastPoint": 1959,
+          "pointCount": 1960,
+          "source": {
+            "kind": "osm",
+            "label": "Tour Du Mont Blanc - Variante du Col de Tricot",
+            "url": "https://hiking.waymarkedtrails.org/#route?id=9678267",
+            "relationId": 9678267,
+            "version": 16,
+            "extractedAt": "2026-10-08T11:23:23.967Z",
+            "license": "© OpenStreetMap contributors — ODbL 1.0",
+            "sha256": "32ae60e6c035219355b7f5f4bfed4afd6d54753d74488001dcb5c21fbd0c0a15",
+            "elevation": "Modèle de terrain OpenRouteService / SRTM"
+          }
+        },
+        {
+          "track": 2,
+          "firstPoint": 1960,
+          "lastPoint": 1961,
+          "pointCount": 2,
+          "source": {
+            "kind": "routing",
+            "label": "Liaison pédestre · Col de Tricot · OpenRouteService",
+            "url": "https://openrouteservice.org",
+            "license": "© OpenStreetMap contributors — ODbL 1.0 ; OpenRouteService",
+            "extractedAt": "2026-10-08T11:23:23.967Z",
+            "elevation": "Modèle de terrain OpenRouteService"
+          }
+        }
+      ]
+    },
+    {
+      "id": "col-des-fours",
+      "file": "gpx/variantes/col-des-fours.gpx",
+      "sha256": "211428118a17f6ff7bafb2c50de6ccbb9acdad7498c0d8e261cc60fa1bdd035c",
+      "sourceFile": "sources/9678296.gpx",
+      "sourceSha256": "554d372d6565556abec081a25ad5d15fa6767ebe7e152b041ea1ea0211ba5c42",
+      "relationId": 9678296,
+      "version": 2,
+      "extractedAt": "2026-10-08T11:23:23.967Z",
+      "transformations": [
+        "Orientation dans le sens antihoraire du TMB",
+        "Altitudes du modèle de terrain OpenRouteService/SRTM"
+      ],
+      "segments": [
+        {
+          "track": 1,
+          "firstPoint": 0,
+          "lastPoint": 495,
+          "pointCount": 496,
+          "source": {
+            "kind": "osm",
+            "label": "Tour Du Mont Blanc - Variante du Col des Fours",
+            "url": "https://hiking.waymarkedtrails.org/#route?id=9678296",
+            "relationId": 9678296,
+            "version": 2,
+            "extractedAt": "2026-10-08T11:23:23.967Z",
+            "license": "© OpenStreetMap contributors — ODbL 1.0",
+            "sha256": "554d372d6565556abec081a25ad5d15fa6767ebe7e152b041ea1ea0211ba5c42",
+            "elevation": "Modèle de terrain OpenRouteService / SRTM"
+          }
+        }
+      ]
+    },
+    {
+      "id": "tete-bernarda",
+      "file": "gpx/variantes/tete-bernarda.gpx",
+      "sha256": "0e3df240e027bf6ec56ed889ec775ba9bed758af6a84cf8fb0132f46d9240570",
+      "sourceFile": "sources/9678375.gpx",
+      "sourceSha256": "e48b23d6d3aa430e473f4a29b15460979e6e7fa8fc24096702049f03b417b3ad",
+      "relationId": 9678375,
+      "version": 8,
+      "extractedAt": "2026-10-08T11:23:23.967Z",
+      "transformations": [
+        "Orientation dans le sens antihoraire du TMB",
+        "Altitudes du modèle de terrain OpenRouteService/SRTM"
+      ],
+      "segments": [
+        {
+          "track": 1,
+          "firstPoint": 0,
+          "lastPoint": 452,
+          "pointCount": 453,
+          "source": {
+            "kind": "osm",
+            "label": "Tour du Mont Blanc - Variante de la Tête Bernarda",
+            "url": "https://hiking.waymarkedtrails.org/#route?id=9678375",
+            "relationId": 9678375,
+            "version": 8,
+            "extractedAt": "2026-10-08T11:23:23.967Z",
+            "license": "© OpenStreetMap contributors — ODbL 1.0",
+            "sha256": "e48b23d6d3aa430e473f4a29b15460979e6e7fa8fc24096702049f03b417b3ad",
+            "elevation": "Modèle de terrain OpenRouteService / SRTM"
+          }
+        }
+      ]
+    },
+    {
+      "id": "fenetre-d-arpette",
+      "file": "gpx/variantes/fenetre-d-arpette.gpx",
+      "sha256": "7a71bcbafed863ef0a7b7b675178d8c180b546d83ca399ea43fe4d4bf0a4ce26",
+      "sourceFile": "sources/9678380.gpx",
+      "sourceSha256": "c89c53058ff26d55ef4108e8b580acd7838f81cbc2235c9fb34e8ba9765266d2",
+      "relationId": 9678380,
+      "version": 9,
+      "extractedAt": "2026-10-08T11:23:23.967Z",
+      "transformations": [
+        "Orientation dans le sens antihoraire du TMB",
+        "Altitudes du modèle de terrain OpenRouteService/SRTM"
+      ],
+      "segments": [
+        {
+          "track": 1,
+          "firstPoint": 0,
+          "lastPoint": 1257,
+          "pointCount": 1258,
+          "source": {
+            "kind": "osm",
+            "label": "Tour Du Mont Blanc - Variante de la Fenêtre d'Arpette",
+            "url": "https://hiking.waymarkedtrails.org/#route?id=9678380",
+            "relationId": 9678380,
+            "version": 9,
+            "extractedAt": "2026-10-08T11:23:23.967Z",
+            "license": "© OpenStreetMap contributors — ODbL 1.0",
+            "sha256": "c89c53058ff26d55ef4108e8b580acd7838f81cbc2235c9fb34e8ba9765266d2",
+            "elevation": "Modèle de terrain OpenRouteService / SRTM"
+          }
+        },
+        {
+          "track": 2,
+          "firstPoint": 1258,
+          "lastPoint": 1389,
+          "pointCount": 132,
+          "source": {
+            "kind": "routing",
+            "label": "Liaison pédestre · Fenêtre d’Arpette · OpenRouteService",
+            "url": "https://openrouteservice.org",
+            "license": "© OpenStreetMap contributors — ODbL 1.0 ; OpenRouteService",
+            "extractedAt": "2026-10-08T11:23:23.967Z",
+            "elevation": "Modèle de terrain OpenRouteService"
+          }
+        }
+      ]
+    },
+    {
+      "id": "les-grands",
+      "file": "gpx/variantes/les-grands.gpx",
+      "sha256": "315500820a65a221ddd6d3747969a8bb4d3627adbe09561f0e43d00f1042cb1f",
+      "sourceFile": "sources/9678437.gpx",
+      "sourceSha256": "b78965795100064d2115a51262e01baf37a1ca0649944484a7e9e7933e2733c6",
+      "relationId": 9678437,
+      "version": 12,
+      "extractedAt": "2026-10-08T11:23:23.967Z",
+      "transformations": [
+        "Orientation dans le sens antihoraire du TMB",
+        "Altitudes du modèle de terrain OpenRouteService/SRTM"
+      ],
+      "segments": [
+        {
+          "track": 1,
+          "firstPoint": 0,
+          "lastPoint": 1225,
+          "pointCount": 1226,
+          "source": {
+            "kind": "osm",
+            "label": "Tour Du Mont Blanc - Variante des Grands",
+            "url": "https://hiking.waymarkedtrails.org/#route?id=9678437",
+            "relationId": 9678437,
+            "version": 12,
+            "extractedAt": "2026-10-08T11:23:23.967Z",
+            "license": "© OpenStreetMap contributors — ODbL 1.0",
+            "sha256": "b78965795100064d2115a51262e01baf37a1ca0649944484a7e9e7933e2733c6",
+            "elevation": "Modèle de terrain OpenRouteService / SRTM"
+          }
+        }
+      ]
+    },
+    {
+      "id": "le-tour",
+      "file": "gpx/variantes/le-tour.gpx",
+      "sha256": "61c1ede2d818f1f618720e45f367da43de1fc1125379a581d178fa289aa66f7a",
+      "sourceFile": "sources/9678501-ways.json",
+      "sourceSha256": "29e9eee304424327874e69c854c41a06c572a2a82a59ea323627fa67f3fa3260",
+      "relationId": 9678501,
+      "version": 16,
+      "extractedAt": "2026-10-16T14:42:49.484Z",
+      "transformations": [
+        "Conversion EPSG:3857 vers WGS84, coordonnées à 7 décimales",
+        "Fusion des chemins jointifs, aucun raccord ajouté",
+        "Altitudes OpenRouteService / SRTM",
+        "Orientation antihoraire et raccord pédestre calculé depuis le TMB ; extrémités ajustées de moins de 1 m"
+      ],
+      "segments": [
+        {
+          "track": 1,
+          "firstPoint": 0,
+          "lastPoint": 6,
+          "pointCount": 7,
+          "source": {
+            "kind": "routing",
+            "label": "Liaison pédestre — Le Tour — OpenRouteService",
+            "url": "https://openrouteservice.org",
+            "profile": "foot-hiking",
+            "preference": "recommended",
+            "extractedAt": "2026-10-16T14:48:32.266Z",
+            "license": "© OpenStreetMap contributors — ODbL 1.0 ; OpenRouteService",
+            "elevation": "Modèle de terrain OpenRouteService"
+          },
+          "sourceFile": "sources/9678501-connector-start.json",
+          "sha256": "2f1e687aa65d3c831c5b37a92320482f8082cba44db811d94b2eafe8c77bac80"
+        },
+        {
+          "track": 2,
+          "firstPoint": 7,
+          "lastPoint": 859,
+          "pointCount": 853,
+          "source": {
+            "label": "OpenStreetMap — relation 9678501 ; altitude OpenRouteService / SRTM",
+            "url": "https://hiking.waymarkedtrails.org/#route?id=9678501",
+            "license": "ODbL 1.0",
+            "licenseUrl": "https://www.openstreetmap.org/copyright",
+            "retrieved": "2026-10-16",
+            "notes": "Géométrie OpenStreetMap via l’API Waymarked Trails, convertie de Web Mercator en WGS84. Relation 9678501, version 16. Altitudes issues du modèle de terrain OpenRouteService / SRTM. Raccord pédestre OpenRouteService inclus depuis le tracé classique, identifié séparément dans le GPX."
+          }
+        }
+      ]
+    },
+    {
+      "id": "vallorcine",
+      "file": "gpx/variantes/vallorcine.gpx",
+      "sha256": "25010a31a0785fa9c518bbd45c33bce8effe5c940d6d409e4640e5b6057240ac",
+      "sourceFile": "sources/9678726-ways.json",
+      "sourceSha256": "d62678802cc0b9bede2cb7cae1c494ff2756c65321af6349946c1043e68480fc",
+      "relationId": 9678726,
+      "version": 16,
+      "extractedAt": "2026-10-16T14:42:49.484Z",
+      "transformations": [
+        "Conversion EPSG:3857 vers WGS84, coordonnées à 7 décimales",
+        "Fusion des chemins jointifs, aucun raccord ajouté",
+        "Altitudes OpenRouteService / SRTM"
+      ],
+      "segments": [
+        {
+          "track": 1,
+          "firstPoint": 0,
+          "lastPoint": 1351,
+          "pointCount": 1352,
+          "source": {
+            "label": "OpenStreetMap — relation 9678726 ; altitude OpenRouteService / SRTM",
+            "url": "https://hiking.waymarkedtrails.org/#route?id=9678726",
+            "license": "ODbL 1.0",
+            "licenseUrl": "https://www.openstreetmap.org/copyright",
+            "retrieved": "2026-10-16",
+            "notes": "Géométrie OpenStreetMap via l’API Waymarked Trails, convertie de Web Mercator en WGS84. Relation 9678726, version 16. Altitudes issues du modèle de terrain OpenRouteService / SRTM."
+          }
+        }
+      ]
+    }
+  ]
+}
