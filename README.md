@@ -2,6 +2,8 @@
 
 Outil web de préparation d'un **Tour du Mont-Blanc personnalisé**. On part du tracé officiel, on affiche et on combine les variantes réelles, on crée ou on modifie son propre parcours sur une carte topographique en suivant les sentiers, puis on exporte le résultat en **GPX 1.1**.
 
+**Site en ligne : https://porygon31.github.io/TmbTripPlanner/** (mis à jour automatiquement à chaque push sur la branche par défaut, une fois les tests passés).
+
 > ⚠️ **Sécurité** : les itinéraires sont indicatifs et **jamais garantis praticables**. La météo, la neige et les fermetures de sentiers peuvent tout changer. Vérifiez toujours les conditions locales avant de partir (voir l'onglet *Projet → Sécurité et conditions*).
 
 ## Fonctionnalités
@@ -48,7 +50,7 @@ Tant que `data/` est vide, l'application fonctionne quand même (création, impo
 
 ## Déploiement
 
-L'application est **100 % statique**. `npm run build` produit `dist/`, à publier tel quel sur n'importe quel hébergeur (GitHub Pages, Netlify, Vercel, Cloudflare Pages, serveur nginx…). La configuration `base: './'` permet de la servir aussi depuis un sous-dossier. À chaque push, la CI publie ce dossier en artefact `tmb-trip-planner-dist`.
+L'application est **100 % statique**. `npm run build` produit `dist/`, à publier tel quel sur n'importe quel hébergeur (GitHub Pages, Netlify, Vercel, Cloudflare Pages, serveur nginx…). La configuration `base: './'` permet de la servir aussi depuis un sous-dossier. À chaque push, la CI publie ce dossier en artefact `tmb-trip-planner-dist` et, sur la branche par défaut, le met en ligne sur GitHub Pages (job `deploy`).
 
 ## Architecture
 
