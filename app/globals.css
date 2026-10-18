@@ -1318,6 +1318,15 @@ input:focus-visible {
   font-size: 11px;
   box-shadow: 0 1px 5px #0005;
 }
+.waypoint-icon.is-selected span {
+  width: 42px;
+  height: 42px;
+  background: #b45125;
+  border: 3px solid #fff;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 0 0 3px #193f47, 0 0 0 8px #ffffffb3, 0 4px 12px #0005;
+}
 .mobile-handle {
   display: none;
 }
@@ -1730,6 +1739,7 @@ input:focus-visible {
   .poi-legend p { margin: 7px 12px 10px; }
   .sidebar.collapsed ~ .map-workspace .poi-legend { bottom: 147px; }
   .sidebar.expanded ~ .map-workspace .poi-legend { bottom: calc(68% + 18px); }
+  .sidebar.expanded ~ .map-workspace .has-selected-waypoint .poi-legend { display: none; }
   .sidebar.collapsed ~ .map-workspace.has-mobile-profile .poi-legend { bottom: 310px; }
   .map-wrap:fullscreen .poi-legend { bottom: 30px; }
 }

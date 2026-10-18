@@ -151,6 +151,8 @@ export default function MapView({
   catalog,
   visible,
   route,
+  selectedWaypointId,
+  onSelectWaypoint = () => {},
   base = "osm",
   onPoint = () => {},
   onAddPoi,
@@ -170,6 +172,8 @@ export default function MapView({
   catalog: Catalog | null;
   visible: string[];
   route: Route | null;
+  selectedWaypointId?: string | null;
+  onSelectWaypoint?: (id: string) => void;
   base?: string;
   onPoint?: (p: RoutePoint) => void;
   onAddPoi?: (poi: PointOfInterest) => void | Promise<void>;
@@ -189,6 +193,31 @@ export default function MapView({
   const provider = providers.find((p) => p.id === base) ?? providers.find(p => p.id === "osm")!;
   const [pois, setPois] = useState<PointOfInterest[]>([]);
   const stops = route ? routeStops(route) : [];
+  const selectedStop = stops.find((w) => w.id === selectedWaypointId);
+  const selectedMarker = useRef<L.Marker | null>(null);
+  useEffect(() => {
+    const marker = selectedMarker.current;
+    const popup = marker?.getPopup();
+    const mapElement = marker?.getElement()?.closest(".map");
+    const sidebar = mapElement?.closest(".workspace")?.querySelector(".sidebar");
+    if (!marker || !popup || !mapElement) return;
+    // Leave room for the mobile editor and the enlarged marker below its popup.
+    const keepVisible = () => {
+      const mapBounds = mapElement.getBoundingClientRect();
+      const panelBounds = sidebar?.getBoundingClientRect();
+      const coveredHeight = panelBounds && panelBounds.left < mapBounds.right && panelBounds.right > mapBounds.left
+        ? Math.max(0, mapBounds.bottom - panelBounds.top) : 0;
+      popup.options.autoPanPaddingTopLeft = L.point(60, 112);
+      popup.options.autoPanPaddingBottomRight = L.point(24, coveredHeight + 80);
+      if (marker.isPopupOpen()) popup.update();
+    };
+    keepVisible();
+    marker.openPopup();
+    const observer = new ResizeObserver(keepVisible);
+    observer.observe(mapElement);
+    if (sidebar) observer.observe(sidebar);
+    return () => { observer.disconnect(); marker.closePopup(); };
+  }, [selectedStop?.id, selectedStop?.lat, selectedStop?.lon]);
   const lastWaypoint = stops.at(-1);
   useEffect(() => {
     fetch("/data/pois.json")
@@ -311,18 +340,21 @@ export default function MapView({
       {stops.map((w, i) => (
         <Marker
           key={`${w.id}-${w.lat}-${w.lon}`}
+          ref={w.id === selectedWaypointId ? selectedMarker : undefined}
           position={[w.lat, w.lon]}
           draggable={editing}
-          zIndexOffset={i === 0 && route?.roundTrip ? 1000 : 0}
+          zIndexOffset={w.id === selectedWaypointId ? 2000 : i === 0 && route?.roundTrip ? 1000 : 0}
           title={`${i === 0 ? route?.roundTrip ? "Départ et arrivée" : "Départ" : `Point ${i + 1}`} · ${w.name}`}
           alt={`${i === 0 && route?.roundTrip ? "Départ et arrivée" : `Point ${i + 1}`} · ${w.name}`}
           icon={L.divIcon({
-            className: `waypoint-icon${i === 0 && route?.roundTrip ? " round-trip-marker" : ""}`,
+            className: `waypoint-icon${i === 0 && route?.roundTrip ? " round-trip-marker" : ""}${w.id === selectedWaypointId ? " is-selected" : ""}`,
             html: `<span>${i === 0 && route?.roundTrip ? "D/A" : i + 1}</span>`,
-            iconSize: i === 0 && route?.roundTrip ? [34, 34] : [26, 26],
-            iconAnchor: i === 0 && route?.roundTrip ? [17, 17] : [13, 13],
+            iconSize: w.id === selectedWaypointId ? [42, 42] : i === 0 && route?.roundTrip ? [34, 34] : [26, 26],
+            iconAnchor: w.id === selectedWaypointId ? [21, 21] : i === 0 && route?.roundTrip ? [17, 17] : [13, 13],
+            popupAnchor: [0, w.id === selectedWaypointId ? -24 : -15],
           })}
           eventHandlers={{
+            click: () => onSelectWaypoint(w.id),
             dragend: (e) => {
               const p = e.target.getLatLng();
               onMove(w.id, { lat: p.lat, lon: p.lng });

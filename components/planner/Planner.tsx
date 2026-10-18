@@ -270,6 +270,8 @@ export default function Planner() {
   const selectWaypoint = (id: string) => {
     const w = route.waypoints.find((p) => p.id === id)!;
     setSelected(selected === id ? null : id);
+    setNotice("");
+    setPoiExpanded(false);
     setLat(String(w.lat));
     setLon(String(w.lon));
   };
@@ -740,6 +742,7 @@ export default function Planner() {
                         <span className="waypoint-number">{i + 1}</span>
                         <button
                           className="waypoint-name"
+                          aria-pressed={selected === w.id}
                           onClick={() => selectWaypoint(w.id)}
                         >
                           <strong>{w.name}</strong>
@@ -1034,7 +1037,7 @@ export default function Planner() {
           }
         >
           <div
-            className={`map-wrap ${mode !== "view" ? "drawing" : ""}`}
+            className={`map-wrap ${mode !== "view" ? "drawing" : ""}${stops.some((w) => w.id === selected) ? " has-selected-waypoint" : ""}`}
             data-tour="map"
             ref={mapWrap}
           >
@@ -1042,6 +1045,8 @@ export default function Planner() {
               catalog={catalog}
               visible={visible}
               route={route}
+              selectedWaypointId={selected}
+              onSelectWaypoint={(id) => { if (id !== selected) selectWaypoint(id); }}
               base={base}
               onPoint={mapClick}
               onAddPoi={addPoi}
