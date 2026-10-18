@@ -2,6 +2,10 @@
 
 Préparer son Tour du Mont-Blanc : fond Classique par défaut et Relief au choix, cinq variantes OSM, parcours pédestres OpenRouteService, points déplaçables, hôtels et refuges, statistiques entre points, profil altimétrique, GPX, sauvegardes locales et étapes.
 
+**[Ouvrir TMB Atelier](https://tmb-atelier.poorygon.chatgpt.site/)** · Code de l’application sur la branche `main` de [Porygon31/TmbTripPlanner](https://github.com/Porygon31/TmbTripPlanner).
+
+GitHub Actions vérifie les tests, TypeScript et la compilation de `main`. GitHub Pages publie depuis cette branche une redirection vers l’application hébergée sur Sites, qui exécute les API serveur et conserve la clé OpenRouteService. Le déploiement de l’application sur Sites reste une opération distincte d’un push GitHub. L’ancienne application est conservée dans la branche `archive/main-before-sites-2026-10-18`.
+
 **Guide de configuration, sources, tests et maintenance : [MAINTENANCE.md](./MAINTENANCE.md).**
 
 ## Utilisation

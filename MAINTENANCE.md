@@ -21,6 +21,16 @@ Un HTTP 504 signifie qu’OpenRouteService n’a pas répondu dans le délai imp
 
 ## Vérifications
 
+### GitHub et publication
+
+Le dépôt GitHub est `Porygon31/TmbTripPlanner`, branche principale `main`. Le workflow `.github/workflows/ci.yml` teste et compile cette branche puis publie le dossier `github-pages/`. Ce dossier redirige l’ancienne adresse `https://porygon31.github.io/TmbTripPlanner/` vers le site public `https://tmb-atelier.poorygon.chatgpt.site/`.
+
+L’application complète utilise les routes serveur `/api/route` et `/api/elevation` ; GitHub Pages ne les exécute pas. Les déploiements Sites utilisent le projet existant dans `.openai/hosting.json` et son dépôt source géré. Après une modification de l’application, publier sur Sites la même révision que celle de `main` ; un push GitHub ne déclenche pas ce déploiement. Ne jamais placer `ORS_API_KEY` dans GitHub Pages ou les artefacts client.
+
+L’ancien `main` est archivé sous `archive/main-before-sites-2026-10-18` (commit `6c4c824aaed4dc9839acfadb6e69bc6cb6e2eb3c`). Le dossier local `TmbTripPlanner` contient encore cette ancienne application : le dossier de travail du site actuel est `tmb-planner`.
+
+### Commandes locales
+
 ```powershell
 npm test
 npx tsc --noEmit
