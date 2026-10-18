@@ -90,19 +90,21 @@ export async function handleORS(request: Request, kind: "route" | "elevation") {
             format_out: "geojson",
             geometry: { type: "LineString", coordinates },
           };
+    // A real short route near Les Houches took 44 s; keep a bounded wait for hiking.
+    const timeoutMs = kind === "route" ? 60000 : 25000;
     let response: Response;
     try {
       response = await fetch(url, {
         method: "POST",
         headers: { Authorization: key, "Content-Type": "application/json" },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(25000),
+        signal: AbortSignal.timeout(timeoutMs),
       });
     } catch (error) {
       const timeout = error instanceof Error && ["TimeoutError", "AbortError"].includes(error.name);
       console.warn("OpenRouteService request failed", { kind, reason: timeout ? "timeout" : "network" });
       return fail(timeout
-        ? "OpenRouteService n’a pas répondu dans les 25 secondes. Le service de randonnée peut être temporairement indisponible. Réessayez plus tard ; votre parcours est conservé."
+        ? `OpenRouteService n’a pas répondu dans les ${timeoutMs / 1000} secondes. Le service peut être temporairement indisponible. Réessayez plus tard ; votre parcours est conservé.`
         : "La connexion à OpenRouteService a échoué. Réessayez plus tard ; votre parcours est conservé.",
         timeout ? 504 : 502);
     }

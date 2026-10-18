@@ -59,3 +59,28 @@ test('invalid provider JSON is an upstream error, not invalid user input', async
     assert.equal((await handleORS(request({ coordinates }, 'bad-provider-json'), 'route')).status, 502);
   } finally { globalThis.fetch = original; }
 });
+
+test('a valid hiking route taking 44 seconds is not cancelled at the former 25-second deadline', async (t) => {
+  process.env.ORS_API_KEY = 'test-only-placeholder';
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  // Make AbortSignal's deadline use the test clock as well as the delayed response.
+  t.mock.method(AbortSignal, 'timeout', (milliseconds: number) => {
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(new DOMException('Deadline', 'TimeoutError')), milliseconds);
+    return controller.signal;
+  });
+  let ready!: () => void;
+  const started = new Promise<void>(resolve => { ready = resolve; });
+  t.mock.method(globalThis, 'fetch', (_url: unknown, options: RequestInit) => new Promise<Response>((resolve, reject) => {
+    options.signal?.addEventListener('abort', () => reject(options.signal?.reason), { once: true });
+    setTimeout(() => resolve(Response.json({ features: [{ geometry: { coordinates: [[6.7981,45.8908,1000],[6.7781,45.8902,1200]] } }] })), 44000);
+    ready();
+  }));
+  const pending = handleORS(request({ coordinates }, 'slow-valid-route'), 'route');
+  await started;
+  t.mock.timers.tick(44000);
+  const response = await pending;
+  assert.equal(response.status, 200);
+  const data = await response.json() as { points: { ele: number }[] };
+  assert.equal(data.points[1].ele, 1200);
+});
