@@ -73,9 +73,9 @@ export async function handleORS(request: Request, kind: "route" | "elevation") {
     const url =
       kind === "route"
         ? (process.env.ORS_DIRECTIONS_URL ??
-          "https://api.openrouteservice.org/v2/directions/foot-hiking/geojson")
+          "https://api.heigit.org/openrouteservice/v2/directions/foot-hiking/geojson")
         : (process.env.ORS_ELEVATION_URL ??
-          "https://api.openrouteservice.org/elevation/line");
+          "https://api.heigit.org/openelevationservice/v0/line");
     const body =
       kind === "route"
         ? {
@@ -90,12 +90,22 @@ export async function handleORS(request: Request, kind: "route" | "elevation") {
             format_out: "geojson",
             geometry: { type: "LineString", coordinates },
           };
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { Authorization: key, "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(25000),
-    });
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        method: "POST",
+        headers: { Authorization: key, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(25000),
+      });
+    } catch (error) {
+      const timeout = error instanceof Error && ["TimeoutError", "AbortError"].includes(error.name);
+      console.warn("OpenRouteService request failed", { kind, reason: timeout ? "timeout" : "network" });
+      return fail(timeout
+        ? "OpenRouteService n’a pas répondu dans les 25 secondes. Le service de randonnée peut être temporairement indisponible. Réessayez plus tard ; votre parcours est conservé."
+        : "La connexion à OpenRouteService a échoué. Réessayez plus tard ; votre parcours est conservé.",
+        timeout ? 504 : 502);
+    }
     if (response.status === 429)
       return fail(
         "Le quota OpenRouteService est atteint. Réessayez plus tard ; le dernier parcours valide est conservé.",
@@ -114,17 +124,19 @@ export async function handleORS(request: Request, kind: "route" | "elevation") {
           : "OpenRouteService est indisponible. Réessayez plus tard.",
         response.status < 500 ? 422 : 502,
       );
-    const result = (await response.json()) as {
-      features?: { geometry: { coordinates: number[][] } }[];
-      geometry?: { coordinates: number[][] };
-    };
+    let result: {
+      features?: { geometry?: { coordinates?: number[][] } }[];
+      geometry?: { coordinates?: number[][] };
+    } | null;
+    try { result = await response.json(); }
+    catch { return fail("OpenRouteService a renvoyé une réponse illisible. Votre parcours est conservé.", 502); }
     const values =
       kind === "route"
-        ? result.features?.[0]?.geometry.coordinates
-        : result.geometry?.coordinates;
+        ? result?.features?.[0]?.geometry?.coordinates
+        : result?.geometry?.coordinates;
     if (
-      !values?.length ||
-      values.some((p) => !Number.isFinite(p[0]) || !Number.isFinite(p[1]))
+      !Array.isArray(values) || !values.length ||
+      values.some((p) => !Array.isArray(p) || !Number.isFinite(p[0]) || !Number.isFinite(p[1]))
     )
       return fail("Réponse géographique invalide du service.", 502);
     return Response.json(
@@ -143,8 +155,8 @@ export async function handleORS(request: Request, kind: "route" | "elevation") {
     if (error instanceof SyntaxError)
       return fail("Le corps doit être un objet JSON.", 400);
     return fail(
-      "Le service de sentiers ne répond pas dans le délai imparti. Le parcours reste inchangé.",
-      504,
+      "Le calcul n’a pas pu être effectué. Le parcours reste inchangé.",
+      500,
     );
   }
 }

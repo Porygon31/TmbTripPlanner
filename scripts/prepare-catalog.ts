@@ -136,7 +136,7 @@ async function elevate(id: number, points: RoutePoint[], source: Provenance) {
   for (let start = 0; start < points.length; start += 1999) {
     const batch = points.slice(start, start + 1999);
     if (batch.length === 1) batch.unshift(points[start - 1]);
-    const r = await fetch("https://api.openrouteservice.org/elevation/line", {
+    const r = await fetch("https://api.heigit.org/openelevationservice/v0/line", {
       method: "POST",
       headers: {
         Authorization: process.env.ORS_API_KEY,
@@ -215,7 +215,7 @@ for (const [id, name, color, description] of descriptions) {
       route = JSON.parse(await fs.readFile(cache, "utf8"));
     } catch {
       const r = await fetch(
-        "https://api.openrouteservice.org/v2/directions/foot-hiking/geojson",
+        "https://api.heigit.org/openrouteservice/v2/directions/foot-hiking/geojson",
         {
           method: "POST",
           headers: {

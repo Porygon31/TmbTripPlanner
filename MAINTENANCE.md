@@ -15,7 +15,9 @@ npm run dev
 
 La clé reste dans `.env.local` (ignoré par Git) et dans le secret de production Sites `ORS_API_KEY`. Ne jamais utiliser un préfixe `NEXT_PUBLIC_`, inclure la clé dans un GPX, ou la publier dans le dépôt. Après rotation, modifier le secret Sites puis redéployer une version sauvegardée pour appliquer la nouvelle révision d’environnement.
 
-Les variables optionnelles `ORS_DIRECTIONS_URL` et `ORS_ELEVATION_URL` permettent de changer les adresses des services. Les valeurs fonctionnelles vérifiées figurent dans `.env.example`. Le routage utilise `foot-hiking`, `preference: recommended`, `elevation: true`, avec accrochage aux sentiers à 100 mètres maximum. Un échec conserve le parcours précédent ; aucune droite de remplacement n’est créée.
+Les variables optionnelles `ORS_DIRECTIONS_URL` et `ORS_ELEVATION_URL` permettent de changer les adresses des services. Les adresses officielles actuelles figurent dans `.env.example` : `api.heigit.org/openrouteservice/v2/directions/foot-hiking/geojson` et `api.heigit.org/openelevationservice/v0/line`. L’ancien domaine `api.openrouteservice.org` est déprécié ; voir la [migration annoncée par HeiGIT](https://ask.openrouteservice.org/t/deprecating-api-openrouteservice-org-in-favour-of-api-heigit-org/7912). La clé existante reste valable. Le routage utilise `foot-hiking`, `preference: recommended`, `elevation: true`, avec accrochage aux sentiers à 100 mètres maximum. Un échec conserve le parcours précédent ; aucune droite de remplacement n’est créée.
+
+Un HTTP 504 signifie qu’OpenRouteService n’a pas répondu en 25 secondes. Un HTTP 502 indique une connexion échouée, une réponse illisible ou une indisponibilité renvoyée par le fournisseur. Consulter les journaux serveur (type de service et motif uniquement, sans clé ni coordonnées) et l’[état des services HeiGIT](https://status.heigit.org/). Un test qui réussit dans une autre région ne suffit pas : vérifier aussi un trajet près des Houches. Allonger le délai ne résout pas une panne du fournisseur.
 
 ## Vérifications
 
